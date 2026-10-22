@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sehatin | Salad Indonesia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <meta
+      name="description"
+      content="Temukan resep salad khas Indonesia yang segar dan sehat tanpa minyak tambahan."
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <header class="navbar">
+      <a href="#" class="logo">
+        <span class="logo-icon">✳</span>
+        sehatin<span class="logo-dot">.</span>
+      </a>
+      <nav class="nav-menu">
+        <a href="#beranda" class="nav-link active">Beranda</a>
+        <a href="#resep" class="nav-link">Jelajahi Resep</a>
+        <a href="#favorit" class="nav-link">
+          Favorit <span id="nav-fav-count">0</span>
+        </a>
+      </nav>
+    </header>
+    <main>
+      <!-- HERO SECTION -->
+      <section class="hero" id="beranda">
+        <div class="hero-content">
+          <span class="eyebrow">
+            <span class="green-dot"></span>
+            SEGAR DARI ALAM, LEZAT KHAS NUSANTARA
+          </span>
+
+          <h1>
+            Makan sehat,<br />
+            hidup lebih <em>seimbang.</em>
+          </h1>
+
+          <p>
+            Temukan berbagai resep salad khas Indonesia dari sayuran dan buah
+            segar, dengan bumbu tradisional tanpa minyak tambahan.
+          </p>
+
+          <a href="#resep" class="primary-button">
+            Jelajahi Resep  
+          </a>
+
+          <div class="hero-note">
+            <span></span>
+            <div>
+              <strong>Lebih segar setiap hari</strong>
+              <p>Resep sederhana dari bahan lokal</p>
+            </div>
+          </div>
+        </div>
+        <div class="hero-image">
+          <div class="image-decoration"></div>
+
+          <img
+            src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1000&q=85"
+            alt="Salad segar dengan aneka sayuran"
+          />
+        </div>
+      </section>
+      <section class="stats">
+        <div class="stat-item">
+          <strong id="recipe-total">6</strong>
+          <span>Inspirasi Resep</span>
+        </div>
+        <div class="stat-item">
+          <strong>100%</strong>
+          <span>Tanpa Minyak Tambahan</span>
+        </div>
+        <div class="stat-item">
+          <strong>Segar</strong>
+          <span>Bahan Pilihan Lokal</span>
+        </div>
+      </section>
+      <section class="recipe-section" id="resep">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">DARI DAPUR NUSANTARA</span>
+            <h2>Temukan resep <em>favoritmu.</em></h2>
+            <p>
+              Salad tradisional Indonesia dengan bahan segar dan cara memasak
+              yang lebih sehat.
+            </p>
+          </div>
+          <div class="recipe-heading-actions">
+            <span class="result-pill">
+              <span class="green-dot"></span>
+              <span id="result-count">6 resep tersedia</span>
+            </span>
+            <button type="button" id="add-recipe-button" class="primary-button">
+              + Tambah Resep
+            </button>
+          </div>
+        </div>
+        <div class="filter-panel">
+          <div class="search-box">
+            <label for="search-input">Cari resep</label>
+            <input
+              type="search"
+              id="search-input"
+              placeholder="Contoh: gado-gado..."
+            />
+          </div>
+          <div class="filter-box">
+            <label for="allergy-filter"> Hindari bahan / alergi </label>
+
+            <select id="allergy-filter">
+              <option value="">Semua bahan</option>
+              <option value="kacang">Kacang</option>
+              <option value="susu">Susu</option>
+              <option value="telur">Telur</option>
+              <option value="seafood">Seafood</option>
+              <option value="gluten">Gluten</option>
+              <option value="kedelai">Kedelai</option>
+            </select>
+          </div>
+          <div class="filter-box">
+            <label for="diet-filter"> Pilih kategorimu </label>
+            <select id="diet-filter">
+              <option value="">Semua menu</option>
+              <option value="vegetarian">Vegetarian</option>
+              <option value="vegan">Non Vegetarian</option>
+            </select>
+          </div>
+          <button id="reset-filters" class="reset-button">Reset ↺</button>
+        </div>
+        <div id="active-filter" class="active-filter"></div>
+        <div id="recipe-grid" class="recipe-grid"></div>
+        <div id="empty-state" class="empty-state" hidden>
+          <div>🥬</div>
+          <h3>Resep tidak ditemukan</h3>
+          <p>Coba gunakan kata kunci atau filter lainnya.</p>
+          <button id="empty-reset" class="secondary-button">
+            Hapus Filter
+          </button>
+        </div>
+      </section>
+      <section class="favorite-section" id="favorit">
+        <div class="favorite-heading">
+          <div>
+            <span class="eyebrow">KOLEKSI PRIBADIMU</span>
+            <h2>Resep yang kamu <em>sukai.</em></h2>
+            <p>Simpan salad favoritmu dan temukan kembali kapan saja.</p>
+          </div>
+          <div class="favorite-counter">
+            <span>☆</span>
+            <div>
+              <strong id="favorite-total">0 resep</strong>
+              <p>Resep tersimpan</p>
+            </div>
+          </div>
+        </div>
+        <div id="favorite-grid" class="recipe-grid favorite-grid"></div>
+        <div id="favorite-empty" class="favorite-empty">
+          <span>☆</span>
+          <p>
+            Belum ada resep favorit. Klik ikon hati pada resep yang kamu suka.
+          </p>
+        </div>
+      </section>
+    </main>
+    <footer class="footer">
+      <a href="#" class="logo">
+        <span class="logo-icon">✳</span>
+        sehatin<span class="logo-dot">.</span>
+      </a>
+      <p>Pilihan segar dari Nusantara untuk hidup lebih seimbang.</p>
+      <span class="copyright"> © 2026 Sehatin </span>
+    </footer>
+    <!-- FORM TAMBAH RESEP FIRESTORE -->
+    <dialog id="add-recipe-dialog" class="recipe-dialog add-recipe-dialog">
+      <button type="button" id="add-recipe-close" class="dialog-close" aria-label="Tutup form">×</button>
+      <div class="add-recipe-form-wrap">
+        <span class="eyebrow">KOLEKSI SEHATIN</span>
+        <h2>Tambah resep baru</h2>
+        <p>Resep yang disimpan akan masuk ke Cloud Firestore.</p>
+        <form id="add-recipe-form">
+          <div class="add-recipe-fields">
+            <label>Nama resep
+              <input name="name" required maxlength="100" placeholder="Contoh: Salad Sayur Sehat" />
+            </label>
+            <label>Kategori
+              <select name="category" required>
+                <option>Salad Nusantara</option>
+                <option>Sayuran Mentah</option>
+                <option>Salad Buah</option>
+              </select>
+            </label>
+            <label>Estimasi kalori per porsi
+              <input name="calories" type="number" min="0" required value="300" />
+            </label>
+            <label>Waktu memasak (menit)
+              <input name="time" type="number" min="1" required value="15" />
+            </label>
+            <label>Protein per porsi (gram)
+              <input name="protein" type="number" min="0" step="0.1" value="0" />
+            </label>
+            <label>Preferensi diet
+              <select name="diet">
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="vegetarian,vegan">Vegetarian dan vegan</option>
+              </select>
+            </label>
+            <label class="full-width">Bahan-bahan (pisahkan dengan koma)
+              <textarea name="ingredients" required rows="3" placeholder="Kangkung, kol, tauge, tahu"></textarea>
+            </label>
+            <label class="full-width">Takaran bahan (satu takaran per baris)
+              <textarea name="amounts" rows="3" placeholder="1 genggam kangkung&#10;50 g kol&#10;50 g tauge"></textarea>
+            </label>
+            <label class="full-width">Langkah memasak (satu langkah per baris)
+              <textarea name="steps" required rows="4" placeholder="Cuci semua bahan.&#10;Potong bahan.&#10;Sajikan."></textarea>
+            </label>
+            <label class="full-width">Informasi alergi (pisahkan dengan koma)
+              <input name="allergens" placeholder="kacang, susu, telur — isi 'Tidak ada' jika tidak ada" />
+            </label>
+            <label class="full-width">Deskripsi
+              <textarea name="description" required rows="3" placeholder="Deskripsi singkat resep"></textarea>
+            </label>
+            <label class="full-width">URL gambar (opsional)
+              <input name="image" type="url" placeholder="https://..." />
+            </label>
+          </div>
+          <p id="add-recipe-message" class="add-recipe-message" role="status"></p>
+          <button type="submit" class="primary-button">Simpan ke Firebase</button>
+        </form>
+      </div>
+    </dialog>
+
+    <dialog id="recipe-dialog" class="recipe-dialog">
+      <button
+        id="dialog-close"
+        class="dialog-close"
+        aria-label="Tutup detail resep"
+      >
+        ×
+      </button>
+      <div id="dialog-content"></div>
+    </dialog>
+    <div id="toast" class="toast" role="status"></div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
