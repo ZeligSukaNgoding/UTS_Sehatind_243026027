@@ -1,3 +1,7 @@
+/* =========================================
+   FIREBASE: KONFIGURASI DAN FIRESTORE
+   Pastikan Firebase Console project ID cocok.
+========================================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import {
   getFirestore,
@@ -19,6 +23,10 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 const recipesCollection = collection(db, "Makanan_Sehat");
+
+/* =========================================
+   1. DATA RESEP SALAD INDONESIA
+========================================= */
 
 let recipes = [
   {
@@ -259,6 +267,45 @@ let recipes = [
 ];
 
 /* =========================================
+   MEMUAT RESEP DARI FIRESTORE
+========================================= */
+async function loadRecipesFromFirestore() {
+  try {
+    const snapshot = await getDocs(recipesCollection);
+    const firestoreRecipes = snapshot.docs.map((docSnap) => {
+      const data = docSnap.data();
+      return {
+        id: data.id || docSnap.id,
+        name: data.name || "Resep tanpa nama",
+        category: data.category || "Salad Nusantara",
+        time: Number(data.time) || 15,
+        calories: Number(data.calories) || 0,
+        protein: Number(data.protein) || 0,
+        diet: Array.isArray(data.diet) ? data.diet : ["vegetarian"],
+        allergens: Array.isArray(data.allergens) ? data.allergens : [],
+        ingredients: Array.isArray(data.ingredients) ? data.ingredients : [],
+        amounts: Array.isArray(data.amounts) ? data.amounts : (Array.isArray(data.ingredients) ? data.ingredients : []),
+        steps: Array.isArray(data.steps) ? data.steps : [],
+        description: data.description || "",
+        image: data.image || "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=85",
+        firestoreDocId: docSnap.id
+      };
+    });
+
+    // Gabungkan resep lokal dan Firebase; resep Firebase dengan ID sama menggantikan lokal.
+    const combined = new Map(recipes.map((recipe) => [recipe.id, recipe]));
+    firestoreRecipes.forEach((recipe) => combined.set(recipe.id, recipe));
+    recipes = [...combined.values()];
+    favorites = loadFavorites();
+    render();
+    console.info(`Firestore: ${firestoreRecipes.length} dokumen resep berhasil dibaca.`);
+  } catch (error) {
+    console.error("Gagal membaca resep dari Firestore:", error);
+    showToast("Gagal memuat resep Firebase. Periksa koneksi dan Firestore Rules.");
+  }
+}
+
+/* =========================================
    2. MENGAMBIL ELEMEN HTML
 ========================================= */
 
@@ -410,10 +457,10 @@ function createRecipeCard(recipe) {
   meta.className = "card-meta";
 
   const calories = document.createElement("span");
-  calories.innerHTML = ` <strong>±${recipe.calories}</strong> kkal/porsi`;
+  calories.innerHTML = `◉ <strong>±${recipe.calories}</strong> kkal/porsi`;
 
   const protein = document.createElement("span");
-  protein.innerHTML = ` <strong>${recipe.protein} g</strong> protein`;
+  protein.innerHTML = `↗ <strong>${recipe.protein} g</strong> protein`;
 
   meta.append(calories, protein);
 
@@ -428,7 +475,7 @@ function createRecipeCard(recipe) {
   detailButton.type = "button";
   detailButton.className = "detail-link";
   detailButton.dataset.detail = recipe.id;
-  detailButton.textContent = "Lihat resep";
+  detailButton.textContent = "Lihat resep ↗";
 
   footer.append(ingredientCount, detailButton);
 
