@@ -1,7 +1,3 @@
-/* ========================================
-   SEHATIN — SALAD INDONESIA
-   Modern, fresh, responsive UI
-======================================== */
 
 :root {
   --green: #39833d;
@@ -63,8 +59,7 @@ section {
 main {
   width: 100%;
 }
-
-/* NAVBAR */
+ 
 
 .navbar {
   width: 100%;
@@ -171,8 +166,7 @@ main {
   background: var(--green-dark);
   transform: translateY(-2px);
 }
-
-/* HERO */
+  
 
 .hero {
   width: 100%;
@@ -350,8 +344,7 @@ h2 em {
   color: var(--muted);
   font-size: 0.78rem;
 }
-
-/* STATISTIK */
+ 
 
 .stats {
   width: 88%;
@@ -441,8 +434,7 @@ h2 em {
   color: var(--muted);
   font-size: 0.8rem;
 }
-
-/* PENCARIAN DAN FILTER */
+ 
 
 .filter-panel {
   display: grid;
@@ -521,8 +513,7 @@ h2 em {
   color: var(--muted);
   font-size: 0.82rem;
 }
-
-/* KARTU RESEP */
+ 
 
 .recipe-grid {
   display: grid;
@@ -578,8 +569,7 @@ h2 em {
   line-height: 1.3;
   transition: transform 0.2s ease, background 0.2s ease;
 }
-
-/* KARTU RESEP: TOMBOL DAN SUSUNAN KONTEN */
+ 
 .recipe-card {
   display: flex;
   flex-direction: column;
@@ -737,7 +727,6 @@ h2 em {
   transform: translateY(-1px);
 }
 
-/* KEADAAN KOSONG */
 
 .empty-state,
 .favorite-empty {
@@ -768,8 +757,6 @@ h2 em {
 [hidden] {
   display: none !important;
 }
-
-/* FAVORIT */
 
 .favorite-section {
   margin-top: 20px;
@@ -813,7 +800,6 @@ h2 em {
   font-size: 2.5rem;
 }
 
-/* FOOTER */
 
 .footer {
   display: flex;
@@ -844,8 +830,6 @@ h2 em {
   color: #cfdfd2;
   font-size: 0.78rem;
 }
-
-/* MODAL DETAIL RESEP */
 
 .recipe-dialog {
   width: min(92vw, 760px);
@@ -914,8 +898,6 @@ h2 em {
   margin: 12px 0 22px;
 }
 
-/* NOTIFIKASI */
-
 .toast {
   max-width: calc(100vw - 32px);
   position: fixed;
@@ -939,8 +921,6 @@ h2 em {
   opacity: 1;
   transform: translate(-50%, 0);
 }
-
-/* RESPONSIVE TABLET */
 
 @media (max-width: 1050px) {
   .navbar {
@@ -978,8 +958,6 @@ h2 em {
     height: 195px;
   }
 }
-
-/* RESPONSIVE HP */
 
 @media (max-width: 700px) {
   .navbar {
@@ -1137,8 +1115,6 @@ h2 em {
   }
 }
 
-/* RESPONSIVE HP KECIL */
-
 @media (max-width: 390px) {
   .nav-menu {
     gap: 7px;
@@ -1170,8 +1146,6 @@ h2 em {
   }
 }
 
-/* AKSESIBILITAS */
-
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -1189,7 +1163,6 @@ select:focus-visible {
   }
 }
 
-/* FINAL OVERRIDES: konsistensi kartu resep */
 #recipe-grid,
 #favorite-grid {
   align-items: stretch;
@@ -1239,8 +1212,6 @@ select:focus-visible {
   }
 }
 
-
-/* PERBAIKAN NAVBAR: selalu di atas dan menu aktif mengikuti scroll */
 html {
   scroll-padding-top: 110px;
 }
@@ -1268,8 +1239,6 @@ section {
   }
 }
 
-
-/* Form tambah resep Firebase */
 .recipe-heading-actions {
   display: flex;
   align-items: center;
@@ -1338,12 +1307,91 @@ section {
   .recipe-heading-actions { align-items: flex-start; }
 }
 
-
-/* Ukuran lebih kecil untuk tombol Tambah Resep */
 #add-recipe-button {
   padding: 9px 14px;
   font-size: 0.88rem;
   min-height: 38px;
   border-radius: 10px;
   line-height: 1.2;
+}
+
+/* ===== PERAPIAN DETAIL RESEP ===== */
+
+#dialog-content {
+  padding: 26px;
+  overflow-wrap: break-word;
+}
+
+#dialog-content img {
+  width: 100%;
+  max-height: 340px;
+  margin-bottom: 22px;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+#dialog-content h2,
+#dialog-content h3 {
+  margin-top: 22px;
+  margin-bottom: 12px;
+  color: var(--green-dark);
+  line-height: 1.35;
+}
+
+#dialog-content p,
+#dialog-content li {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+#dialog-content p {
+  margin-bottom: 12px;
+}
+
+#dialog-content ul,
+#dialog-content ol {
+  padding-left: 23px;
+  margin: 12px 0 22px;
+}
+
+/* Informasi waktu, kalori, dan protein */
+#dialog-content .dialog-facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 12px 0 20px;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+/* Tampilan HP */
+@media (max-width: 600px) {
+  #dialog-content {
+    padding: 20px;
+  }
+
+  #dialog-content img {
+    max-height: 260px;
+    margin-bottom: 18px;
+  }
+
+  #dialog-content h2,
+  #dialog-content h3 {
+    margin-top: 18px;
+    margin-bottom: 10px;
+    font-size: 1.25rem;
+  }
+
+  #dialog-content p,
+  #dialog-content li {
+    font-size: 0.85rem;
+    line-height: 1.65;
+  }
+
+  #dialog-content .dialog-facts {
+    gap: 8px 12px;
+    font-size: 0.82rem;
+  }
 }

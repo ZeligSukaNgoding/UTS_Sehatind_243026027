@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- NAVBAR -->
     <header class="navbar">
       <a href="#" class="logo">
         <span class="logo-icon">✳</span>
@@ -32,7 +31,6 @@
       </nav>
     </header>
     <main>
-      <!-- HERO SECTION -->
       <section class="hero" id="beranda">
         <div class="hero-content">
           <span class="eyebrow">
@@ -55,7 +53,7 @@
           </a>
 
           <div class="hero-note">
-            <span class="note-icon">🌿</span>
+            <span class="note-icon"></span>
             <div>
               <strong>Lebih segar setiap hari</strong>
               <p>Resep sederhana dari bahan lokal</p>
@@ -135,7 +133,7 @@
               <option value="vegan">Non Vegetarian</option>
             </select>
           </div>
-          <button id="reset-filters" class="reset-button">Reset ↺</button>
+          <button id="reset-filters" class="reset-button">Reset </button>
         </div>
         <div id="active-filter" class="active-filter"></div>
         <div id="recipe-grid" class="recipe-grid"></div>
@@ -156,7 +154,7 @@
             <p>Simpan salad favoritmu dan temukan kembali kapan saja.</p>
           </div>
           <div class="favorite-counter">
-            <span>♡</span>
+            <span>☆</span>
             <div>
               <strong id="favorite-total">0 resep</strong>
               <p>Resep tersimpan</p>
@@ -165,7 +163,7 @@
         </div>
         <div id="favorite-grid" class="recipe-grid favorite-grid"></div>
         <div id="favorite-empty" class="favorite-empty">
-          <span>♡</span>
+          <span>☆</span>
           <p>
             Belum ada resep favorit. Klik ikon hati pada resep yang kamu suka.
           </p>
@@ -230,7 +228,11 @@
             <label class="full-width">Deskripsi
               <textarea name="description" required rows="3" placeholder="Deskripsi singkat resep"></textarea>
             </label>
-            <label class="full-width">URL gambar (opsional)
+            <label class="full-width">Pilih foto dari perangkat (opsional)
+              <input name="imageFile" type="file" accept="image/*" />
+              <small>Di HP, pilih foto dari Galeri atau File Manager. Maksimal 5 MB.</small>
+            </label>
+            <label class="full-width">Atau masukkan URL gambar (opsional)
               <input name="image" type="url" placeholder="https://..." />
             </label>
           </div>
@@ -252,6 +254,6 @@
     </dialog>
     <div id="toast" class="toast" role="status"></div>
 
-    <script type="module" src="app.js"></script>
+    <script type="module" src="app.js?v=20261022-2"></script>
   </body>
 </html>

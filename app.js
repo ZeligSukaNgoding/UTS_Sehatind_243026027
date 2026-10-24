@@ -1,15 +1,17 @@
-/* =========================================
-   FIREBASE: KONFIGURASI DAN FIRESTORE
-   Pastikan Firebase Console project ID cocok.
-========================================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import {
   getFirestore,
   collection,
-  getDocs,
+  onSnapshot,
   addDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBBDjIrzs6j5rtC7Jf2y7_yfSkpAVsU3_8",
@@ -22,11 +24,8 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
+const storage = getStorage(firebaseApp);
 const recipesCollection = collection(db, "Makanan_Sehat");
-
-/* =========================================
-   1. DATA RESEP SALAD INDONESIA
-========================================= */
 
 let recipes = [
   {
@@ -266,12 +265,9 @@ let recipes = [
   },
 ];
 
-/* =========================================
-   MEMUAT RESEP DARI FIRESTORE
-========================================= */
-async function loadRecipesFromFirestore() {
-  try {
-    const snapshot = await getDocs(recipesCollection);
+function loadRecipesFromFirestore() {
+
+  onSnapshot(recipesCollection, (snapshot) => {
     const firestoreRecipes = snapshot.docs.map((docSnap) => {
       const data = docSnap.data();
       return {
@@ -292,22 +288,17 @@ async function loadRecipesFromFirestore() {
       };
     });
 
-    // Gabungkan resep lokal dan Firebase; resep Firebase dengan ID sama menggantikan lokal.
     const combined = new Map(recipes.map((recipe) => [recipe.id, recipe]));
     firestoreRecipes.forEach((recipe) => combined.set(recipe.id, recipe));
     recipes = [...combined.values()];
     favorites = loadFavorites();
     render();
     console.info(`Firestore: ${firestoreRecipes.length} dokumen resep berhasil dibaca.`);
-  } catch (error) {
+  }, (error) => {
     console.error("Gagal membaca resep dari Firestore:", error);
-    showToast("Gagal memuat resep Firebase. Periksa koneksi dan Firestore Rules.");
-  }
+    showToast("Gagal memuat resep Firebase. Periksa Firestore Rules dan koneksi.");
+  });
 }
-
-/* =========================================
-   2. MENGAMBIL ELEMEN HTML
-========================================= */
 
 const searchInput = document.getElementById("search-input");
 const allergyFilter = document.getElementById("allergy-filter");
@@ -331,14 +322,6 @@ const toast = document.getElementById("toast");
 const addRecipeDialog = document.getElementById("add-recipe-dialog");
 const addRecipeForm = document.getElementById("add-recipe-form");
 const addRecipeMessage = document.getElementById("add-recipe-message");
-
-/* =========================================
-   3. PENYIMPANAN FAVORIT SEMENTARA
-========================================= */
-
-// Untuk tahap awal, favorit disimpan di browser.
-// Pada langkah Firebase, bagian ini akan kita integrasikan
-// dengan Cloud Firestore.
 
 function loadFavorites() {
   try {
@@ -371,10 +354,6 @@ function saveFavorites() {
   }
 }
 
-/* =========================================
-   4. NOTIFIKASI
-========================================= */
-
 let toastTimer;
 
 function showToast(message) {
@@ -388,9 +367,6 @@ function showToast(message) {
   }, 2500);
 }
 
-/* =========================================
-   5. MEMBUAT KARTU RESEP
-========================================= */
 
 function createRecipeCard(recipe) {
   const isFavorite = favorites.has(recipe.id);
@@ -457,10 +433,10 @@ function createRecipeCard(recipe) {
   meta.className = "card-meta";
 
   const calories = document.createElement("span");
-  calories.innerHTML = `◉ <strong>±${recipe.calories}</strong> kkal/porsi`;
+  calories.innerHTML = ` <strong>±${recipe.calories}</strong> kkal/porsi`;
 
   const protein = document.createElement("span");
-  protein.innerHTML = `↗ <strong>${recipe.protein} g</strong> protein`;
+  protein.innerHTML = ` <strong>${recipe.protein} g</strong> protein`;
 
   meta.append(calories, protein);
 
@@ -475,7 +451,7 @@ function createRecipeCard(recipe) {
   detailButton.type = "button";
   detailButton.className = "detail-link";
   detailButton.dataset.detail = recipe.id;
-  detailButton.textContent = "Lihat resep ↗";
+  detailButton.textContent = "Lihat resep ";
 
   footer.append(ingredientCount, detailButton);
 
@@ -484,10 +460,6 @@ function createRecipeCard(recipe) {
 
   return card;
 }
-
-/* =========================================
-   6. PENCARIAN DAN FILTER
-========================================= */
 
 function getFilteredRecipes() {
   const query = searchInput.value.trim().toLowerCase();
@@ -505,9 +477,6 @@ function getFilteredRecipes() {
       .toLowerCase();
 
     const matchesSearch = !query || searchableText.includes(query);
-
-    // Menyembunyikan resep yang terdaftar mengandung
-    // alergen yang dipilih.
     const matchesAllergy = !allergy || !recipe.allergens.includes(allergy);
 
     const matchesDiet = !diet || recipe.diet.includes(diet);
@@ -515,10 +484,6 @@ function getFilteredRecipes() {
     return matchesSearch && matchesAllergy && matchesDiet;
   });
 }
-
-/* =========================================
-   7. MENAMPILKAN RESEP DAN FAVORIT
-========================================= */
 
 function renderRecipeList(container, recipeList) {
   container.replaceChildren();
@@ -569,10 +534,6 @@ function render() {
 
   favoriteEmpty.hidden = favoriteRecipes.length > 0;
 }
-
-/* =========================================
-   8. DETAIL RESEP
-========================================= */
 
 function openRecipe(recipeId) {
   const recipe = recipes.find((item) => item.id === recipeId);
@@ -645,8 +606,8 @@ const category = document.createElement("span");
   favoriteButton.className = "primary-button";
   favoriteButton.dataset.favorite = recipe.id;
   favoriteButton.textContent = favorites.has(recipe.id)
-    ? "♥ Hapus dari favorit"
-    : "♡ Simpan ke favorit";
+    ? "★ Hapus dari favorit"
+    : "☆ Simpan ke favorit";
 
   body.append(
     category,
@@ -668,10 +629,6 @@ const category = document.createElement("span");
   }
 }
 
-/* =========================================
-   9. TAMBAH / HAPUS FAVORIT
-========================================= */
-
 function toggleFavorite(recipeId) {
   const recipe = recipes.find((item) => item.id === recipeId);
 
@@ -688,25 +645,16 @@ function toggleFavorite(recipeId) {
   saveFavorites();
   render();
 
-  // Memperbarui tombol favorit pada detail resep
-  // jika modal sedang terbuka.
   if (recipeDialog.open) {
     openRecipe(recipeId);
   }
 }
 
-/* =========================================
-   10. EVENT LISTENER
-========================================= */
-
-// Pencarian langsung ketika pengguna mengetik
 searchInput.addEventListener("input", render);
 
-// Filter ketika pilihan diubah
 allergyFilter.addEventListener("change", render);
 dietFilter.addEventListener("change", render);
 
-// Reset semua filter
 function resetFilters() {
   searchInput.value = "";
   allergyFilter.value = "";
@@ -721,7 +669,6 @@ document
 
 document.getElementById("empty-reset").addEventListener("click", resetFilters);
 
-// Satu event listener untuk kartu, detail, dan tombol favorit
 document.addEventListener("click", (event) => {
   const favoriteButton = event.target.closest("[data-favorite]");
 
@@ -740,21 +687,16 @@ document.addEventListener("click", (event) => {
   }
 });
 
-// Tutup modal
 document.getElementById("dialog-close").addEventListener("click", () => {
   recipeDialog.close();
 });
 
-// Tutup modal ketika area luar diklik
 recipeDialog.addEventListener("click", (event) => {
   if (event.target === recipeDialog) {
     recipeDialog.close();
   }
 });
 
-/* =========================================
-   FORM TAMBAH RESEP KE FIRESTORE
-========================================= */
 const addRecipeButton = document.getElementById("add-recipe-button");
 const addRecipeClose = document.getElementById("add-recipe-close");
 
@@ -795,6 +737,33 @@ addRecipeForm?.addEventListener("submit", async (event) => {
     .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const id = `${slug || "resep"}-${Date.now()}`;
 
+  let imageUrl = String(formData.get("image") || "").trim();
+  const imageFile = formData.get("imageFile");
+
+  try {
+    if (imageFile instanceof File && imageFile.size > 0) {
+      if (!imageFile.type.startsWith("image/")) {
+        throw new Error("Pilih file gambar yang valid.");
+      }
+      if (imageFile.size > 5 * 1024 * 1024) {
+        throw new Error("Ukuran foto maksimal 5 MB.");
+      }
+      addRecipeMessage.textContent = "Mengunggah foto...";
+      const safeFileName = imageFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const imagePath = `recipe-images/${Date.now()}-${safeFileName}`;
+      const imageObjectRef = storageRef(storage, imagePath);
+      await uploadBytes(imageObjectRef, imageFile, { contentType: imageFile.type });
+      imageUrl = await getDownloadURL(imageObjectRef);
+    }
+  } catch (error) {
+    console.error("Gagal mengunggah foto:", error);
+    addRecipeMessage.textContent = error.message ||
+      "Foto gagal diunggah. Periksa Firebase Storage Rules dan koneksi internet.";
+    showToast("Foto gagal diunggah ke Firebase Storage.");
+    submitButton.disabled = false;
+    return;
+  }
+
   const newRecipe = {
     id,
     name,
@@ -808,7 +777,7 @@ addRecipeForm?.addEventListener("submit", async (event) => {
     amounts: amounts.length ? amounts : ingredients,
     steps,
     description: String(formData.get("description") || "").trim(),
-    image: String(formData.get("image") || "").trim() ||
+    image: imageUrl ||
       "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=85",
     createdAt: serverTimestamp()
   };
@@ -823,16 +792,13 @@ addRecipeForm?.addEventListener("submit", async (event) => {
   } catch (error) {
     console.error("Gagal menyimpan resep:", error);
     addRecipeMessage.textContent =
-      "Gagal menyimpan. Periksa Firestore Rules dan koneksi internet.";
+      "Gagal menyimpan resep. Periksa Firestore Rules dan koneksi internet.";
     showToast("Resep belum tersimpan. Periksa Rules Firestore.");
   } finally {
     submitButton.disabled = false;
   }
 });
 
-/* =========================================
-   11. JALANKAN WEBSITE
-========================================= */
 
 render();
 loadRecipesFromFirestore();
@@ -841,9 +807,6 @@ console.log("Sehatin berhasil dijalankan.");
 console.log(`Jumlah resep: ${recipes.length}`);
 
 
-/* =========================================
-   12. NAVBAR: MENU AKTIF DAN SCROLL
-========================================= */
 const navLinks = [...document.querySelectorAll(".nav-menu .nav-link")];
 const navTargets = navLinks
   .map((link) => document.querySelector(link.getAttribute("href")))
@@ -868,7 +831,7 @@ navLinks.forEach((link) => {
   });
 });
 
-// Ubah menu aktif berdasarkan bagian halaman yang paling terlihat.
+
 if ("IntersectionObserver" in window) {
   const navObserver = new IntersectionObserver(
     (entries) => {
