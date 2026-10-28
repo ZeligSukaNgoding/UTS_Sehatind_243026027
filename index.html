@@ -61,7 +61,7 @@
       </section>
       <section class="stats">
         <div class="stat-item">
-          <strong id="recipe-total">6</strong>
+          <strong id="recipe-total">0</strong>
           <span>Inspirasi Resep</span>
         </div>
         <div class="stat-item">
@@ -86,7 +86,7 @@
           <div class="recipe-heading-actions">
             <span class="result-pill">
               <span class="green-dot"></span>
-              <span id="result-count">6 resep tersedia</span>
+              <span id="result-count">0 resep tersedia</span>
             </span>
             <button type="button" id="add-recipe-button" class="primary-button">
               + Tambah Resep
@@ -102,9 +102,9 @@
               placeholder="Contoh: gado-gado..."
             />
           </div>
-          <div class="filter-box">
-            <label for="allergy-filter"> Hindari bahan / alergi </label>
 
+          <div class="filter-box">
+            <label for="allergy-filter">Berdasarkan bahan dasar</label>
             <select id="allergy-filter">
               <option value="">Semua bahan</option>
               <option value="kacang">Kacang</option>
@@ -115,15 +115,23 @@
               <option value="kedelai">Kedelai</option>
             </select>
           </div>
+
           <div class="filter-box">
-            <label for="diet-filter"> Pilih kategorimu </label>
+            <label for="diet-filter">Pilih alergi</label>
             <select id="diet-filter">
-              <option value="">Semua menu</option>
-              <option value="vegetarian">Vegetarian</option>
-              <option value="vegan">Non Vegetarian</option>
+              <option value="">Semua alergi</option>
+              <option value="kacang">Kacang</option>
+              <option value="susu">Susu</option>
+              <option value="telur">Telur</option>
+              <option value="seafood">Seafood</option>
+              <option value="gluten">Gluten</option>
+              <option value="kedelai">Kedelai</option>
             </select>
           </div>
-          <button id="reset-filters" class="reset-button">Reset</button>
+
+          <button id="reset-filters" class="reset-button" type="button">
+            Reset
+          </button>
         </div>
         <div id="active-filter" class="active-filter"></div>
         <div id="recipe-grid" class="recipe-grid"></div>
@@ -283,7 +291,11 @@
                 type="file"
                 accept="image/*"
               />
-              <small>Gambar akan dikompres dan disimpan bersama dokumen Firestore. Pilih foto maksimal 10 MB; ukuran hasil kompres dibatasi agar dokumen tidak terlalu besar.</small>
+              <small
+                >Gambar akan dikompres dan disimpan bersama dokumen Firestore.
+                Pilih foto maksimal 10 MB; ukuran hasil kompres dibatasi agar
+                dokumen tidak terlalu besar.</small
+              >
             </label>
             <label class="full-width">
               Atau URL gambar (opsional)
@@ -293,7 +305,10 @@
                 type="url"
                 placeholder="https://contoh.com/gambar.jpg"
               />
-              <small>Jika file dan URL diisi, file dari perangkat akan digunakan.</small>
+              <small
+                >Jika file dan URL diisi, file dari perangkat akan
+                digunakan.</small
+              >
             </label>
           </div>
           <p

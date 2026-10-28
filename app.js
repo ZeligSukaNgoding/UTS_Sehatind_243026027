@@ -4,7 +4,7 @@ import {
   collection,
   getDocs,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -13,16 +13,14 @@ const firebaseConfig = {
   projectId: "uts-sehat-243026027",
   storageBucket: "uts-sehat-243026027.firebasestorage.app",
   messagingSenderId: "323997518053",
-  appId: "1:323997518053:web:ab044a5c89cc33c9ecec0c"
+  appId: "1:323997518053:web:ab044a5c89cc33c9ecec0c",
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 const recipesCollection = collection(db, "Makanan_Sehat");
 
-let recipes = [
-  
-];
+let recipes = [];
 async function loadRecipesFromFirestore() {
   try {
     const snapshot = await getDocs(recipesCollection);
@@ -38,11 +36,15 @@ async function loadRecipesFromFirestore() {
         diet: Array.isArray(data.diet) ? data.diet : ["vegetarian"],
         allergens: Array.isArray(data.allergens) ? data.allergens : [],
         ingredients: Array.isArray(data.ingredients) ? data.ingredients : [],
-        amounts: Array.isArray(data.amounts) ? data.amounts : (Array.isArray(data.ingredients) ? data.ingredients : []),
+        amounts: Array.isArray(data.amounts)
+          ? data.amounts
+          : Array.isArray(data.ingredients)
+            ? data.ingredients
+            : [],
         steps: Array.isArray(data.steps) ? data.steps : [],
         description: data.description || "",
         image: String(data.image || "").trim(),
-        firestoreDocId: docSnap.id
+        firestoreDocId: docSnap.id,
       };
     });
     const combined = new Map(recipes.map((recipe) => [recipe.id, recipe]));
@@ -50,10 +52,14 @@ async function loadRecipesFromFirestore() {
     recipes = [...combined.values()];
     favorites = loadFavorites();
     render();
-    console.info(`Firestore: ${firestoreRecipes.length} dokumen resep berhasil dibaca.`);
+    console.info(
+      `Firestore: ${firestoreRecipes.length} dokumen resep berhasil dibaca.`,
+    );
   } catch (error) {
     console.error("Gagal membaca resep dari Firestore:", error);
-    showToast("Gagal memuat resep Firebase. Periksa koneksi dan Firestore Rules.");
+    showToast(
+      "Gagal memuat resep Firebase. Periksa koneksi dan Firestore Rules.",
+    );
   }
 }
 
@@ -78,9 +84,7 @@ const dialogContent = document.getElementById("dialog-content");
 const toast = document.getElementById("toast");
 const addRecipeDialog = document.getElementById("add-recipe-dialog");
 const addRecipeForm = document.getElementById("add-recipe-form");
-const imageUrlInput = addRecipeForm.querySelector(
-  'input[name="image"]'
-);
+const imageUrlInput = addRecipeForm.querySelector('input[name="image"]');
 const imageFileInput = addRecipeForm.querySelector('input[name="imageFile"]');
 const addRecipeMessage = document.getElementById("add-recipe-message");
 function loadFavorites() {
@@ -138,7 +142,11 @@ function createRecipeCard(recipe) {
   const image = document.createElement("img");
   image.alt = "";
   image.loading = "lazy";
-  if (recipe.image && (/^https?:\/\/\S+$/i.test(recipe.image) || /^data:image\/(png|jpeg|webp|gif);base64,/i.test(recipe.image))) {
+  if (
+    recipe.image &&
+    (/^https?:\/\/\S+$/i.test(recipe.image) ||
+      /^data:image\/(png|jpeg|webp|gif);base64,/i.test(recipe.image))
+  ) {
     image.src = recipe.image;
     image.onerror = () => {
       image.hidden = true;
@@ -226,32 +234,37 @@ function createRecipeCard(recipe) {
 }
 
 function getFilteredRecipes() {
-  const query = searchInput.value.trim().toLowerCase();
-  const allergy = allergyFilter.value;
-  const diet = dietFilter.value;
+  const searchTerm = searchInput.value.trim().toLowerCase();
+  const ingredientTerm = allergyFilter.value.trim().toLowerCase();
+  const allergyTerm = dietFilter.value.trim().toLowerCase();
 
   return recipes.filter((recipe) => {
-    const searchableText = [
-      recipe.name,
-      recipe.description,
-      recipe.category,
-      ...recipe.ingredients,
-    ]
-      .join(" ")
-      .toLowerCase();
+    const recipeName = String(recipe.name || "").toLowerCase();
+    const description = String(recipe.description || "").toLowerCase();
 
-    const matchesSearch = !query || searchableText.includes(query);
+    const ingredients = Array.isArray(recipe.ingredients)
+      ? recipe.ingredients.join(" ").toLowerCase()
+      : String(recipe.ingredients || "").toLowerCase();
 
-    // Menyembunyikan resep yang terdaftar mengandung
-    // alergen yang dipilih.
-    const matchesAllergy = !allergy || !recipe.allergens.includes(allergy);
+    const allergens = Array.isArray(recipe.allergens)
+      ? recipe.allergens.join(" ").toLowerCase()
+      : String(recipe.allergens || "").toLowerCase();
 
-    const matchesDiet = !diet || recipe.diet.includes(diet);
+    const matchesSearch =
+      !searchTerm ||
+      recipeName.includes(searchTerm) ||
+      description.includes(searchTerm) ||
+      ingredients.includes(searchTerm);
 
-    return matchesSearch && matchesAllergy && matchesDiet;
+    const matchesIngredient =
+      !ingredientTerm || ingredients.includes(ingredientTerm);
+
+    const matchesAllergy =
+      !allergyTerm || allergens.includes(allergyTerm);
+
+    return matchesSearch && matchesIngredient && matchesAllergy;
   });
 }
-
 /* =========================================
    7. MENAMPILKAN RESEP DAN FAVORIT
 ========================================= */
@@ -266,25 +279,17 @@ function renderRecipeList(container, recipeList) {
 
 function render() {
   const filteredRecipes = getFilteredRecipes();
-
   renderRecipeList(recipeGrid, filteredRecipes);
-
   recipeTotal.textContent = recipes.length;
-
   resultCount.textContent = `${filteredRecipes.length} resep ditemukan`;
-
   emptyState.hidden = filteredRecipes.length > 0;
-
   const filterDescriptions = [];
-
   if (searchInput.value.trim()) {
     filterDescriptions.push(`Pencarian: "${searchInput.value.trim()}"`);
   }
-
   if (allergyFilter.value) {
     filterDescriptions.push(`Tanpa bahan: ${allergyFilter.value}`);
   }
-
   if (dietFilter.value) {
     filterDescriptions.push(
       `Preferensi: ${dietFilter.value.replace("-", " ")}`,
@@ -296,33 +301,24 @@ function render() {
     : "";
 
   const favoriteRecipes = recipes.filter((recipe) => favorites.has(recipe.id));
-
   renderRecipeList(favoriteGrid, favoriteRecipes);
-
   favoriteTotal.textContent = `${favoriteRecipes.length} resep`;
-
   navFavCount.textContent = favoriteRecipes.length;
-
   favoriteEmpty.hidden = favoriteRecipes.length > 0;
 }
 
-/* =========================================
-   8. DETAIL RESEP
-========================================= */
-
 function openRecipe(recipeId) {
-  const recipe = recipes.find(
-    (item) => String(item.id) === String(recipeId)
-  );
-
+  const recipe = recipes.find((item) => String(item.id) === String(recipeId));
   if (!recipe) return;
-
   dialogContent.replaceChildren();
-
   const image = document.createElement("img");
   image.className = "dialog-image";
   image.alt = recipe.name || "Foto resep";
-  if (recipe.image && (/^https?:\/\/\S+$/i.test(recipe.image) || /^data:image\/(png|jpeg|webp|gif);base64,/i.test(recipe.image))) {
+  if (
+    recipe.image &&
+    (/^https?:\/\/\S+$/i.test(recipe.image) ||
+      /^data:image\/(png|jpeg|webp|gif);base64,/i.test(recipe.image))
+  ) {
     image.src = recipe.image;
     image.onerror = () => {
       image.hidden = true;
@@ -333,68 +329,53 @@ function openRecipe(recipeId) {
 
   const body = document.createElement("div");
   body.className = "dialog-body";
-
   const category = document.createElement("span");
   category.className = "eyebrow";
   category.textContent = (recipe.category || "").toUpperCase();
-
   const title = document.createElement("h2");
   title.textContent = recipe.name || "Resep";
-// Informasi alergi resep
-const allergyInfo = document.createElement("p");
-allergyInfo.className = "dialog-allergens";
+  // Informasi alergi resep
+  const allergyInfo = document.createElement("p");
+  allergyInfo.className = "dialog-allergens";
+  const allergens = Array.isArray(recipe.allergens)
+    ? recipe.allergens
+    : String(recipe.allergens || "")
+        .split(/,|\n|;/)
+        .map((item) => item.trim())
+        .filter(Boolean);
 
-const allergens = Array.isArray(recipe.allergens)
-  ? recipe.allergens
-  : String(recipe.allergens || "")
-      .split(/,|\n|;/)
-      .map(item => item.trim())
-      .filter(Boolean);
+  allergyInfo.textContent = allergens.length
+    ? `Alergi: ${allergens.join(", ")}`
+    : "Alergi: Tidak ada informasi alergi";
 
-allergyInfo.textContent = allergens.length
-  ? `Alergi: ${allergens.join(", ")}`
-  : "Alergi: Tidak ada informasi alergi";
-
-const description = document.createElement("p");
-description.textContent = recipe.description || "";
-
+  const description = document.createElement("p");
+  description.textContent = recipe.description || "";
   const facts = document.createElement("div");
   facts.className = "dialog-facts";
-
   const time = document.createElement("span");
   time.textContent = `◷ ${recipe.time || 0} menit`;
-
   const calories = document.createElement("span");
   calories.textContent = `±${recipe.calories || 0} kkal/porsi`;
-
   const protein = document.createElement("span");
   protein.textContent = `${recipe.protein || 0} g protein`;
-
   facts.append(time, calories, protein);
 
   // BAHAN-BAHAN: setiap bahan menjadi satu bullet
   const ingredientsTitle = document.createElement("h3");
   ingredientsTitle.textContent = "Bahan-bahan";
-
   const ingredientList = createRecipeList(
     recipe.amounts || recipe.ingredients || [],
-    "ul"
+    "ul",
   );
 
   // CARA MEMBUAT: setiap langkah mendapat nomor otomatis
   const stepsTitle = document.createElement("h3");
   stepsTitle.textContent = "Cara membuat";
-
-  const stepsList = createRecipeList(
-    recipe.steps || [],
-    "ol"
-  );
-
+  const stepsList = createRecipeList(recipe.steps || [], "ol");
   const note = document.createElement("p");
   note.textContent =
     "Catatan: estimasi nutrisi dapat berbeda berdasarkan ukuran porsi dan bahan yang digunakan. Periksa label bahan dan saus jika memiliki alergi.";
   note.style.marginTop = "20px";
-
   const favoriteButton = document.createElement("button");
   favoriteButton.type = "button";
   favoriteButton.className = "primary-button";
@@ -404,18 +385,18 @@ description.textContent = recipe.description || "";
     : "☆ Simpan ke favorit";
 
   body.append(
-  category,
-  allergyInfo,
-  title,
-  description,
-  facts,
-  ingredientsTitle,
-  ingredientList,
-  stepsTitle,
-  stepsList,
-  note,
-  favoriteButton
-);
+    category,
+    allergyInfo,
+    title,
+    description,
+    facts,
+    ingredientsTitle,
+    ingredientList,
+    stepsTitle,
+    stepsList,
+    note,
+    favoriteButton,
+  );
 
   dialogContent.append(image, body);
 
@@ -451,11 +432,6 @@ function createRecipeList(items, type = "ul") {
   return list;
 }
 
-
-/* =========================================
-   9. TAMBAH / HAPUS FAVORIT
-========================================= */
-
 function toggleFavorite(recipeId) {
   const recipe = recipes.find((item) => item.id === recipeId);
 
@@ -478,10 +454,6 @@ function toggleFavorite(recipeId) {
     openRecipe(recipeId);
   }
 }
-
-/* =========================================
-   10. EVENT LISTENER
-========================================= */
 
 // Pencarian langsung ketika pengguna mengetik
 searchInput.addEventListener("input", render);
@@ -536,9 +508,6 @@ recipeDialog.addEventListener("click", (event) => {
   }
 });
 
-/* =========================================
-   FORM TAMBAH RESEP KE FIRESTORE
-========================================= */
 const addRecipeButton = document.getElementById("add-recipe-button");
 const addRecipeClose = document.getElementById("add-recipe-close");
 
@@ -570,11 +539,15 @@ async function localImageToDataUrl(file) {
     image.src = objectUrl;
     await new Promise((resolve, reject) => {
       image.onload = resolve;
-      image.onerror = () => reject(new Error("File gambar tidak dapat dibaca."));
+      image.onerror = () =>
+        reject(new Error("File gambar tidak dapat dibaca."));
     });
 
     const maxSide = 900;
-    const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+    const scale = Math.min(
+      1,
+      maxSide / Math.max(image.naturalWidth, image.naturalHeight),
+    );
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
     canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
@@ -587,7 +560,9 @@ async function localImageToDataUrl(file) {
     let dataUrl = canvas.toDataURL("image/jpeg", 0.68);
     if (dataUrl.length > 450000) dataUrl = canvas.toDataURL("image/jpeg", 0.48);
     if (dataUrl.length > 450000) {
-      throw new Error("Gambar masih terlalu besar setelah dikompres. Pilih foto yang lebih kecil.");
+      throw new Error(
+        "Gambar masih terlalu besar setelah dikompres. Pilih foto yang lebih kecil.",
+      );
     }
     return dataUrl;
   } finally {
@@ -604,20 +579,35 @@ addRecipeForm?.addEventListener("submit", async (event) => {
   const formData = new FormData(addRecipeForm);
   const name = String(formData.get("name") || "").trim();
   const ingredients = String(formData.get("ingredients") || "")
-    .split(/[,\\n]/).map((item) => item.trim()).filter(Boolean);
+    .split(/[,\\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
   const amounts = String(formData.get("amounts") || "")
-    .split("\\n").map((item) => item.trim()).filter(Boolean);
+    .split("\\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
   const steps = String(formData.get("steps") || "")
-    .split("\\n").map((item) => item.trim()).filter(Boolean);
+    .split("\\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
   const allergensText = String(formData.get("allergens") || "").trim();
-  const allergens = allergensText && allergensText.toLowerCase() !== "tidak ada"
-    ? allergensText.split(",").map((item) => item.trim().toLowerCase()).filter(Boolean)
-    : [];
+  const allergens =
+    allergensText && allergensText.toLowerCase() !== "tidak ada"
+      ? allergensText
+          .split(",")
+          .map((item) => item.trim().toLowerCase())
+          .filter(Boolean)
+      : [];
   const diet = String(formData.get("diet") || "vegetarian")
-    .split(",").map((item) => item.trim()).filter(Boolean);
-  const slug = name.toLowerCase()
-    .normalize("NFD").replace(/[\\u0300-\\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const slug = name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\\u0300-\\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
   const id = `${slug || "resep"}-${Date.now()}`;
 
   try {
@@ -627,26 +617,30 @@ addRecipeForm?.addEventListener("submit", async (event) => {
       addRecipeMessage.textContent = "Mengompres gambar...";
       imageUrl = await localImageToDataUrl(selectedFile);
     }
-    if (imageUrl && !/^https?:\/\/\S+$/i.test(imageUrl) && !/^data:image\/(png|jpeg|webp|gif);base64,/i.test(imageUrl)) {
+    if (
+      imageUrl &&
+      !/^https?:\/\/\S+$/i.test(imageUrl) &&
+      !/^data:image\/(png|jpeg|webp|gif);base64,/i.test(imageUrl)
+    ) {
       throw new Error("Masukkan URL gambar yang valid atau pilih file gambar.");
     }
 
-  const newRecipe = {
-    id,
-    name,
-    category: String(formData.get("category") || "Salad Nusantara"),
-    time: Number(formData.get("time")) || 15,
-    calories: Number(formData.get("calories")) || 0,
-    protein: Number(formData.get("protein")) || 0,
-    diet,
-    allergens,
-    ingredients,
-    amounts: amounts.length ? amounts : ingredients,
-    steps,
-    description: String(formData.get("description") || "").trim(),
-    image: imageUrl,
-    createdAt: serverTimestamp()
-  };
+    const newRecipe = {
+      id,
+      name,
+      category: String(formData.get("category") || "Salad Nusantara"),
+      time: Number(formData.get("time")) || 15,
+      calories: Number(formData.get("calories")) || 0,
+      protein: Number(formData.get("protein")) || 0,
+      diet,
+      allergens,
+      ingredients,
+      amounts: amounts.length ? amounts : ingredients,
+      steps,
+      description: String(formData.get("description") || "").trim(),
+      image: imageUrl,
+      createdAt: serverTimestamp(),
+    };
 
     await addDoc(recipesCollection, newRecipe);
     recipes.push({ ...newRecipe, createdAt: undefined });
@@ -656,13 +650,11 @@ addRecipeForm?.addEventListener("submit", async (event) => {
     addRecipeForm.reset();
   } catch (error) {
     console.error("Gagal menyimpan resep:", error);
-    addRecipeMessage.textContent = error?.message ||
+    addRecipeMessage.textContent =
+      error?.message ||
       "Gagal menyimpan. Periksa Firestore Rules dan koneksi internet.";
     showToast("Resep belum tersimpan. Periksa Rules Firestore.");
   } finally {
     submitButton.disabled = false;
   }
-}
-);
-
-
+});
