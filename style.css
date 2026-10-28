@@ -1395,3 +1395,160 @@ section {
     font-size: 0.82rem;
   }
 }
+#dialog-content ul,
+#dialog-content ol {
+  display: block;
+  padding-left: 28px;
+  margin: 12px 0 24px;
+}
+
+#dialog-content ul li,
+#dialog-content ol li {
+  display: list-item;
+  margin-bottom: 6px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+#dialog-content ul {
+  list-style-type: disc;
+}
+
+#dialog-content ol {
+  list-style-type: decimal;
+}
+.dialog-allergens {
+  margin: 8px 0 12px;
+  padding: 10px 14px;
+  border-left: 4px solid #d97706;
+  border-radius: 6px;
+  background: #fff8e8;
+  color: #8a4b08;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+
+/* Rapikan kartu resep Sehatin */
+.recipe-card {
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+.card-image {
+  position: relative;
+  overflow: hidden;
+  height: 210px;
+  border-radius: 18px 18px 0 0;
+}
+
+.card-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Tombol favorit di pojok kanan atas */
+.heart-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: #378344;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14);
+  cursor: pointer;
+  font-size: 24px;
+}
+
+/* Label kategori di pojok kiri bawah foto */
+.category-tag {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 1;
+  max-width: calc(100% - 80px);
+  padding: 8px 13px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #185b43;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+/* Tampilan HP */
+@media (max-width: 480px) {
+  .card-image {
+    height: 190px;
+  }
+
+  .heart-btn {
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .category-tag {
+    left: 10px;
+    bottom: 10px;
+    padding: 7px 11px;
+  }
+}
+
+
+/* FIX label kategori pada kartu resep */
+.recipe-card .card-image .category-tag {
+  position: absolute !important;
+  left: 12px;
+  bottom: 12px;
+  top: auto;
+  right: auto;
+
+  display: inline-block;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  box-sizing: border-box;
+
+  padding: 8px 14px;
+  border-radius: 24px;
+
+  background: rgba(255, 255, 255, 0.96);
+  color: #185b43;
+
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+/* Tombol favorit tetap di kanan atas */
+.recipe-card .card-image .heart-btn {
+  position: absolute !important;
+  top: 12px;
+  right: 12px;
+  bottom: auto;
+  left: auto;
+  z-index: 3;
+}
+
+/* Pastikan foto dan label tidak merusak layout */
+.recipe-card .card-image {
+  position: relative;
+  overflow: hidden;
+}

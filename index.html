@@ -48,12 +48,7 @@
             segar, dengan bumbu tradisional tanpa minyak tambahan.
           </p>
 
-          <a href="#resep" class="primary-button">
-            Jelajahi Resep <span></span>
-          </a>
-
-          <div class="hero-note">
-          </div>
+          <a href="#resep" class="primary-button"> Jelajahi Resep </a>
         </div>
         <div class="hero-image">
           <div class="image-decoration"></div>
@@ -128,7 +123,7 @@
               <option value="vegan">Non Vegetarian</option>
             </select>
           </div>
-          <button id="reset-filters" class="reset-button">Reset </button>
+          <button id="reset-filters" class="reset-button">Reset</button>
         </div>
         <div id="active-filter" class="active-filter"></div>
         <div id="recipe-grid" class="recipe-grid"></div>
@@ -168,71 +163,147 @@
     <footer class="footer">
       <a href="#" class="logo">
         <span class="logo-icon">✳</span>
-        sehatin<span class="logo-dot">.</span>
+        sehatind<span class="logo-dot">.</span>
       </a>
       <p>Pilihan segar dari Nusantara untuk hidup lebih seimbang.</p>
       <span class="copyright"> © 2026 Sehatin </span>
     </footer>
     <!-- FORM TAMBAH RESEP FIRESTORE -->
     <dialog id="add-recipe-dialog" class="recipe-dialog add-recipe-dialog">
-      <button type="button" id="add-recipe-close" class="dialog-close" aria-label="Tutup form">×</button>
+      <button
+        type="button"
+        id="add-recipe-close"
+        class="dialog-close"
+        aria-label="Tutup form"
+      >
+        ×
+      </button>
       <div class="add-recipe-form-wrap">
         <span class="eyebrow">KOLEKSI SEHATIN</span>
         <h2>Tambah resep baru</h2>
         <p>Resep yang disimpan akan masuk ke Cloud Firestore.</p>
         <form id="add-recipe-form">
           <div class="add-recipe-fields">
-            <label>Nama resep
-              <input name="name" required maxlength="100" placeholder="Contoh: Salad Sayur Sehat" />
+            <label
+              >Nama resep
+              <input
+                name="name"
+                required
+                maxlength="100"
+                placeholder="Contoh: Salad Sayur Sehat"
+              />
             </label>
-            <label>Kategori
+            <label
+              >Kategori
               <select name="category" required>
                 <option>Salad Nusantara</option>
                 <option>Sayuran Mentah</option>
                 <option>Salad Buah</option>
               </select>
             </label>
-            <label>Estimasi kalori per porsi
-              <input name="calories" type="number" min="0" required value="300" />
+            <label
+              >Estimasi kalori per porsi
+              <input
+                name="calories"
+                type="number"
+                min="0"
+                required
+                value="300"
+              />
             </label>
-            <label>Waktu memasak (menit)
+            <label
+              >Waktu memasak (menit)
               <input name="time" type="number" min="1" required value="15" />
             </label>
-            <label>Protein per porsi (gram)
-              <input name="protein" type="number" min="0" step="0.1" value="0" />
+            <label
+              >Protein per porsi (gram)
+              <input
+                name="protein"
+                type="number"
+                min="0"
+                step="0.1"
+                value="0"
+              />
             </label>
-            <label>Preferensi diet
+            <label
+              >Preferensi diet
               <select name="diet">
                 <option value="vegetarian">Vegetarian</option>
                 <option value="vegan">Vegan</option>
                 <option value="vegetarian,vegan">Vegetarian dan vegan</option>
               </select>
             </label>
-            <label class="full-width">Bahan-bahan (pisahkan dengan koma)
-              <textarea name="ingredients" required rows="3" placeholder="Kangkung, kol, tauge, tahu"></textarea>
+            <label class="full-width"
+              >Bahan-bahan (pisahkan dengan koma)
+              <textarea
+                name="ingredients"
+                required
+                rows="3"
+                placeholder="Kangkung, kol, tauge, tahu"
+              ></textarea>
             </label>
-            <label class="full-width">Takaran bahan (satu takaran per baris)
-              <textarea name="amounts" rows="3" placeholder="1 genggam kangkung&#10;50 g kol&#10;50 g tauge"></textarea>
+            <label class="full-width"
+              >Takaran bahan (satu takaran per baris)
+              <textarea
+                name="amounts"
+                rows="3"
+                placeholder="1 genggam kangkung&#10;50 g kol&#10;50 g tauge"
+              ></textarea>
             </label>
-            <label class="full-width">Langkah memasak (satu langkah per baris)
-              <textarea name="steps" required rows="4" placeholder="Cuci semua bahan.&#10;Potong bahan.&#10;Sajikan."></textarea>
+            <label class="full-width"
+              >Langkah memasak (satu langkah per baris)
+              <textarea
+                name="steps"
+                required
+                rows="4"
+                placeholder="Cuci semua bahan.&#10;Potong bahan.&#10;Sajikan."
+              ></textarea>
             </label>
-            <label class="full-width">Informasi alergi (pisahkan dengan koma)
-              <input name="allergens" placeholder="kacang, susu, telur — isi 'Tidak ada' jika tidak ada" />
+            <label class="full-width"
+              >Informasi alergi (pisahkan dengan koma)
+              <input
+                name="allergens"
+                placeholder="kacang, susu, telur — isi 'Tidak ada' jika tidak ada"
+              />
             </label>
-            <label class="full-width">Deskripsi
-              <textarea name="description" required rows="3" placeholder="Deskripsi singkat resep"></textarea>
+            <label class="full-width"
+              >Deskripsi
+              <textarea
+                name="description"
+                required
+                rows="3"
+                placeholder="Deskripsi singkat resep"
+              ></textarea>
             </label>
-            <label class="full-width">Pilih foto dari perangkat (opsional)
-              <input name="imageFile" type="file" accept="image/*" />
-              <small>Di HP, pilih foto dari Galeri atau File Manager. Maksimal 5 MB.</small>
+            <label class="full-width">
+              Upload gambar dari perangkat (opsional)
+              <input
+                id="image-file"
+                name="imageFile"
+                type="file"
+                accept="image/*"
+              />
+              <small>Gambar akan dikompres dan disimpan bersama dokumen Firestore. Pilih foto maksimal 10 MB; ukuran hasil kompres dibatasi agar dokumen tidak terlalu besar.</small>
             </label>
-            <label class="full-width">Atau masukkan URL gambar (opsional)
-              <input name="image" type="url" placeholder="https://..." />
+            <label class="full-width">
+              Atau URL gambar (opsional)
+              <input
+                id="image-url"
+                name="image"
+                type="url"
+                placeholder="https://contoh.com/gambar.jpg"
+              />
+              <small>Jika file dan URL diisi, file dari perangkat akan digunakan.</small>
             </label>
           </div>
-          <p id="add-recipe-message" class="add-recipe-message" role="status"></p>
-          <button type="submit" class="primary-button">Simpan ke Firebase</button>
+          <p
+            id="add-recipe-message"
+            class="add-recipe-message"
+            role="status"
+          ></p>
+          <button type="submit" class="primary-button">
+            Simpan ke Firebase
+          </button>
         </form>
       </div>
     </dialog>
@@ -249,6 +320,6 @@
     </dialog>
     <div id="toast" class="toast" role="status"></div>
 
-    <script type="module" src="app.js?v=20261022-2"></script>
+    <script type="module" src="app.js?v=20261028-4"></script>
   </body>
 </html>

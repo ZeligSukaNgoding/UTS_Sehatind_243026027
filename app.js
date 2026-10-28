@@ -1,7 +1,3 @@
-/* =========================================
-   FIREBASE: KONFIGURASI DAN FIRESTORE
-   Pastikan Firebase Console project ID cocok.
-========================================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import {
   getFirestore,
@@ -24,251 +20,9 @@ const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 const recipesCollection = collection(db, "Makanan_Sehat");
 
-/* =========================================
-   1. DATA RESEP SALAD INDONESIA
-========================================= */
-
 let recipes = [
-  {
-    id: "gado-gado",
-    name: "Gado-Gado Tanpa Minyak",
-    category: "Salad Nusantara",
-    time: 25,
-    calories: 300,
-    protein: 13,
-    diet: ["vegetarian"],
-    allergens: ["kacang", "telur", "kedelai"],
-    ingredients: [
-      "Kangkung",
-      "Kol",
-      "Tauge",
-      "Kentang",
-      "Tahu kukus",
-      "Telur rebus",
-      "Kacang tanah",
-    ],
-    amounts: [
-      "1 genggam kangkung",
-      "50 g kol",
-      "50 g tauge",
-      "1 kentang kecil",
-      "2 potong tahu kukus",
-      "1 telur rebus",
-      "1 sdm saus kacang",
-    ],
-    steps: [
-      "Cuci bersih semua sayuran.",
-      "Rebus kangkung, kol, tauge, dan kentang hingga matang.",
-      "Kukus tahu dan rebus telur hingga matang.",
-      "Haluskan kacang tanah sangrai dengan air, asam jawa, dan bumbu secukupnya.",
-      "Susun semua bahan dan sajikan dengan saus kacang.",
-    ],
-    description:
-      "Salad khas Indonesia berisi sayuran rebus, tahu, telur, dan saus kacang tanpa minyak tambahan.",
-    image:
-      "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=85",
-  },
-
-  {
-    id: "pecel-sayur",
-    name: "Pecel Sayur Segar",
-    category: "Salad Nusantara",
-    time: 20,
-    calories: 280,
-    protein: 11,
-    diet: ["vegetarian", "vegan"],
-    allergens: ["kacang"],
-    ingredients: [
-      "Bayam",
-      "Kacang panjang",
-      "Tauge",
-      "Mentimun",
-      "Daun kemangi",
-      "Kacang tanah",
-    ],
-    amounts: [
-      "1 genggam bayam",
-      "50 g kacang panjang",
-      "50 g tauge",
-      "½ mentimun",
-      "Daun kemangi secukupnya",
-      "1 sdm sambal pecel",
-    ],
-    steps: [
-      "Cuci semua sayuran hingga bersih.",
-      "Rebus bayam, kacang panjang, dan tauge hingga matang.",
-      "Iris mentimun dan siapkan daun kemangi.",
-      "Encerkan sambal pecel menggunakan air hangat tanpa minyak tambahan.",
-      "Sajikan sayuran dengan sambal pecel secukupnya.",
-    ],
-    description:
-      "Salad sayuran tradisional dengan sambal kacang yang segar dan mudah dibuat.",
-    image:
-      "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=85",
-  },
-
-  {
-    id: "karedok",
-    name: "Karedok Sunda",
-    category: "Sayuran Mentah",
-    time: 15,
-    calories: 260,
-    protein: 9,
-    diet: ["vegetarian", "vegan"],
-    allergens: ["kacang"],
-    ingredients: [
-      "Kacang panjang",
-      "Kol",
-      "Tauge",
-      "Mentimun",
-      "Terong lalap",
-      "Daun kemangi",
-      "Kacang tanah",
-    ],
-    amounts: [
-      "3 batang kacang panjang",
-      "50 g kol",
-      "Segenggam tauge",
-      "½ mentimun",
-      "1 terong lalap kecil",
-      "Daun kemangi secukupnya",
-      "1 sdm saus kacang",
-    ],
-    steps: [
-      "Cuci bersih semua sayuran dan tiriskan.",
-      "Iris kacang panjang, kol, mentimun, dan terong lalap.",
-      "Haluskan kacang sangrai dengan bawang putih, kencur, asam jawa, dan air matang.",
-      "Campurkan sayuran dengan saus kacang.",
-      "Sajikan segera setelah dicampur.",
-    ],
-    description:
-      "Salad khas Sunda dari sayuran segar dengan bumbu kencur dan saus kacang.",
-    image:
-      "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=85",
-  },
-
-  {
-    id: "urap-sayur",
-    name: "Urap Sayur",
-    category: "Salad Nusantara",
-    time: 25,
-    calories: 220,
-    protein: 6,
-    diet: ["vegetarian", "vegan"],
-    allergens: [],
-    ingredients: [
-      "Kacang panjang",
-      "Tauge",
-      "Bayam",
-      "Kelapa parut",
-      "Bawang putih",
-      "Kencur",
-      "Daun jeruk",
-    ],
-    amounts: [
-      "50 g kacang panjang",
-      "50 g tauge",
-      "1 genggam bayam",
-      "2 sdm kelapa parut",
-      "1 siung bawang putih",
-      "Sedikit kencur",
-      "1 lembar daun jeruk",
-    ],
-    steps: [
-      "Rebus kacang panjang, tauge, dan bayam hingga matang.",
-      "Campurkan kelapa parut dengan bawang putih, kencur, dan daun jeruk.",
-      "Bumbui kelapa secukupnya.",
-      "Kukus campuran kelapa berbumbu selama sekitar 10 menit.",
-      "Campurkan kelapa dengan sayuran sebelum disajikan.",
-    ],
-    description:
-      "Sayuran rebus dengan kelapa berbumbu yang dikukus tanpa proses menumis.",
-    image:
-      "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=900&q=85",
-  },
-
-  {
-    id: "salad-buah",
-    name: "Salad Buah Yoghurt",
-    category: "Salad Buah",
-    time: 15,
-    calories: 190,
-    protein: 6,
-    diet: ["vegetarian"],
-    allergens: ["susu"],
-    ingredients: [
-      "Pepaya",
-      "Melon",
-      "Semangka",
-      "Apel",
-      "Yoghurt tawar",
-      "Jeruk nipis",
-    ],
-    amounts: [
-      "100 g pepaya",
-      "100 g melon",
-      "100 g semangka",
-      "½ apel",
-      "3 sdm yoghurt tawar tanpa gula",
-      "1 sdt air jeruk nipis",
-    ],
-    steps: [
-      "Cuci buah yang perlu dicuci, lalu kupas dan potong dadu.",
-      "Campurkan yoghurt tawar dengan air jeruk nipis.",
-      "Aduk buah dengan dressing yoghurt secara perlahan.",
-      "Simpan di kulkas sebentar jika ingin disajikan dingin.",
-      "Hindari tambahan sirup atau susu kental manis jika ingin membatasi gula.",
-    ],
-    description:
-      "Salad buah tropis dengan dressing yoghurt tawar tanpa minyak tambahan.",
-    image:
-      "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=900&q=85",
-  },
-
-  {
-    id: "rujak-buah",
-    name: "Rujak Buah Segar",
-    category: "Salad Buah",
-    time: 15,
-    calories: 170,
-    protein: 3,
-    diet: ["vegetarian", "vegan"],
-    allergens: ["kacang"],
-    ingredients: [
-      "Mangga muda",
-      "Bengkuang",
-      "Nanas",
-      "Mentimun",
-      "Kacang tanah",
-      "Cabai",
-      "Asam jawa",
-    ],
-    amounts: [
-      "½ mangga muda",
-      "100 g bengkuang",
-      "100 g nanas",
-      "½ mentimun",
-      "1 sdt kacang sangrai (opsional)",
-      "Cabai sesuai selera",
-      "1 sdt air asam jawa",
-    ],
-    steps: [
-      "Cuci dan potong buah sesuai selera.",
-      "Ulek cabai dengan sedikit garam dan air asam jawa.",
-      "Tambahkan sedikit air agar bumbu mudah tercampur.",
-      "Sesuaikan gula atau lewati jika ingin membatasi gula tambahan.",
-      "Sajikan buah dengan bumbu rujak tanpa minyak.",
-    ],
-    description:
-      "Salad buah tradisional dengan mangga muda, bengkuang, nanas, dan bumbu asam pedas.",
-    image:
-      "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=900&q=85",
-  },
+  
 ];
-
-/* =========================================
-   MEMUAT RESEP DARI FIRESTORE
-========================================= */
 async function loadRecipesFromFirestore() {
   try {
     const snapshot = await getDocs(recipesCollection);
@@ -287,12 +41,10 @@ async function loadRecipesFromFirestore() {
         amounts: Array.isArray(data.amounts) ? data.amounts : (Array.isArray(data.ingredients) ? data.ingredients : []),
         steps: Array.isArray(data.steps) ? data.steps : [],
         description: data.description || "",
-        image: data.image || "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=85",
+        image: String(data.image || "").trim(),
         firestoreDocId: docSnap.id
       };
     });
-
-    // Gabungkan resep lokal dan Firebase; resep Firebase dengan ID sama menggantikan lokal.
     const combined = new Map(recipes.map((recipe) => [recipe.id, recipe]));
     firestoreRecipes.forEach((recipe) => combined.set(recipe.id, recipe));
     recipes = [...combined.values()];
@@ -304,10 +56,6 @@ async function loadRecipesFromFirestore() {
     showToast("Gagal memuat resep Firebase. Periksa koneksi dan Firestore Rules.");
   }
 }
-
-/* =========================================
-   2. MENGAMBIL ELEMEN HTML
-========================================= */
 
 const searchInput = document.getElementById("search-input");
 const allergyFilter = document.getElementById("allergy-filter");
@@ -330,16 +78,11 @@ const dialogContent = document.getElementById("dialog-content");
 const toast = document.getElementById("toast");
 const addRecipeDialog = document.getElementById("add-recipe-dialog");
 const addRecipeForm = document.getElementById("add-recipe-form");
+const imageUrlInput = addRecipeForm.querySelector(
+  'input[name="image"]'
+);
+const imageFileInput = addRecipeForm.querySelector('input[name="imageFile"]');
 const addRecipeMessage = document.getElementById("add-recipe-message");
-
-/* =========================================
-   3. PENYIMPANAN FAVORIT SEMENTARA
-========================================= */
-
-// Untuk tahap awal, favorit disimpan di browser.
-// Pada langkah Firebase, bagian ini akan kita integrasikan
-// dengan Cloud Firestore.
-
 function loadFavorites() {
   try {
     const saved = JSON.parse(localStorage.getItem("sehatin-favorites") || "[]");
@@ -358,11 +101,9 @@ function loadFavorites() {
 }
 
 let favorites = loadFavorites();
-
 function saveFavorites() {
   try {
     localStorage.setItem("sehatin-favorites", JSON.stringify([...favorites]));
-
     return true;
   } catch (error) {
     console.error("Gagal menyimpan favorit:", error);
@@ -370,10 +111,6 @@ function saveFavorites() {
     return false;
   }
 }
-
-/* =========================================
-   4. NOTIFIKASI
-========================================= */
 
 let toastTimer;
 
@@ -388,10 +125,6 @@ function showToast(message) {
   }, 2500);
 }
 
-/* =========================================
-   5. MEMBUAT KARTU RESEP
-========================================= */
-
 function createRecipeCard(recipe) {
   const isFavorite = favorites.has(recipe.id);
 
@@ -403,9 +136,16 @@ function createRecipeCard(recipe) {
   imageWrapper.dataset.detail = recipe.id;
 
   const image = document.createElement("img");
-  image.src = recipe.image;
-  image.alt = recipe.name;
+  image.alt = "";
   image.loading = "lazy";
+  if (recipe.image && (/^https?:\/\/\S+$/i.test(recipe.image) || /^data:image\/(png|jpeg|webp|gif);base64,/i.test(recipe.image))) {
+    image.src = recipe.image;
+    image.onerror = () => {
+      image.hidden = true;
+    };
+  } else {
+    image.hidden = true;
+  }
 
   const category = document.createElement("span");
   category.className = "category-tag";
@@ -484,10 +224,6 @@ function createRecipeCard(recipe) {
 
   return card;
 }
-
-/* =========================================
-   6. PENCARIAN DAN FILTER
-========================================= */
 
 function getFilteredRecipes() {
   const query = searchInput.value.trim().toLowerCase();
@@ -575,7 +311,9 @@ function render() {
 ========================================= */
 
 function openRecipe(recipeId) {
-  const recipe = recipes.find((item) => item.id === recipeId);
+  const recipe = recipes.find(
+    (item) => String(item.id) === String(recipeId)
+  );
 
   if (!recipe) return;
 
@@ -583,61 +321,78 @@ function openRecipe(recipeId) {
 
   const image = document.createElement("img");
   image.className = "dialog-image";
-  image.src = recipe.image;
-  image.alt = recipe.name;
+  image.alt = recipe.name || "Foto resep";
+  if (recipe.image && (/^https?:\/\/\S+$/i.test(recipe.image) || /^data:image\/(png|jpeg|webp|gif);base64,/i.test(recipe.image))) {
+    image.src = recipe.image;
+    image.onerror = () => {
+      image.hidden = true;
+    };
+  } else {
+    image.hidden = true;
+  }
 
   const body = document.createElement("div");
   body.className = "dialog-body";
-const category = document.createElement("span");
+
+  const category = document.createElement("span");
   category.className = "eyebrow";
-  category.textContent = recipe.category.toUpperCase();
+  category.textContent = (recipe.category || "").toUpperCase();
 
   const title = document.createElement("h2");
-  title.textContent = recipe.name;
+  title.textContent = recipe.name || "Resep";
+// Informasi alergi resep
+const allergyInfo = document.createElement("p");
+allergyInfo.className = "dialog-allergens";
 
-  const description = document.createElement("p");
-  description.textContent = recipe.description;
+const allergens = Array.isArray(recipe.allergens)
+  ? recipe.allergens
+  : String(recipe.allergens || "")
+      .split(/,|\n|;/)
+      .map(item => item.trim())
+      .filter(Boolean);
+
+allergyInfo.textContent = allergens.length
+  ? `Alergi: ${allergens.join(", ")}`
+  : "Alergi: Tidak ada informasi alergi";
+
+const description = document.createElement("p");
+description.textContent = recipe.description || "";
 
   const facts = document.createElement("div");
   facts.className = "dialog-facts";
 
   const time = document.createElement("span");
-  time.textContent = `◷ ${recipe.time} menit`;
+  time.textContent = `◷ ${recipe.time || 0} menit`;
 
   const calories = document.createElement("span");
-  calories.textContent = `±${recipe.calories} kkal/porsi`;
+  calories.textContent = `±${recipe.calories || 0} kkal/porsi`;
 
   const protein = document.createElement("span");
-  protein.textContent = `${recipe.protein} g protein`;
+  protein.textContent = `${recipe.protein || 0} g protein`;
 
   facts.append(time, calories, protein);
 
+  // BAHAN-BAHAN: setiap bahan menjadi satu bullet
   const ingredientsTitle = document.createElement("h3");
   ingredientsTitle.textContent = "Bahan-bahan";
 
-  const ingredientList = document.createElement("ul");
+  const ingredientList = createRecipeList(
+    recipe.amounts || recipe.ingredients || [],
+    "ul"
+  );
 
-  recipe.amounts.forEach((amount) => {
-    const item = document.createElement("li");
-    item.textContent = amount;
-    ingredientList.appendChild(item);
-  });
-
+  // CARA MEMBUAT: setiap langkah mendapat nomor otomatis
   const stepsTitle = document.createElement("h3");
   stepsTitle.textContent = "Cara membuat";
 
-  const stepsList = document.createElement("ol");
-
-  recipe.steps.forEach((step) => {
-    const item = document.createElement("li");
-    item.textContent = step;
-    stepsList.appendChild(item);
-  });
+  const stepsList = createRecipeList(
+    recipe.steps || [],
+    "ol"
+  );
 
   const note = document.createElement("p");
   note.textContent =
     "Catatan: estimasi nutrisi dapat berbeda berdasarkan ukuran porsi dan bahan yang digunakan. Periksa label bahan dan saus jika memiliki alergi.";
-
   note.style.marginTop = "20px";
 
   const favoriteButton = document.createElement("button");
@@ -645,21 +400,22 @@ const category = document.createElement("span");
   favoriteButton.className = "primary-button";
   favoriteButton.dataset.favorite = recipe.id;
   favoriteButton.textContent = favorites.has(recipe.id)
-    ? "Hapus dari favorit"
-    : "Simpan ke favorit";
+    ? "★ Hapus dari favorit"
+    : "☆ Simpan ke favorit";
 
   body.append(
-    category,
-    title,
-    description,
-    facts,
-    ingredientsTitle,
-    ingredientList,
-    stepsTitle,
-    stepsList,
-    note,
-    favoriteButton,
-  );
+  category,
+  allergyInfo,
+  title,
+  description,
+  facts,
+  ingredientsTitle,
+  ingredientList,
+  stepsTitle,
+  stepsList,
+  note,
+  favoriteButton
+);
 
   dialogContent.append(image, body);
 
@@ -667,6 +423,34 @@ const category = document.createElement("span");
     recipeDialog.showModal();
   }
 }
+
+function splitRecipeItems(text) {
+  if (Array.isArray(text)) {
+    return text
+      .flatMap((item) => splitRecipeItems(String(item)))
+      .filter(Boolean);
+  }
+
+  if (!text) return [];
+
+  return String(text)
+    .split(/\n|,|;/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function createRecipeList(items, type = "ul") {
+  const list = document.createElement(type);
+
+  splitRecipeItems(items).forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    list.appendChild(li);
+  });
+
+  return list;
+}
+
 
 /* =========================================
    9. TAMBAH / HAPUS FAVORIT
@@ -770,6 +554,47 @@ addRecipeDialog?.addEventListener("click", (event) => {
   if (event.target === addRecipeDialog) addRecipeDialog.close();
 });
 
+async function localImageToDataUrl(file) {
+  if (!file) return "";
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Pilih file gambar yang valid.");
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    throw new Error("Ukuran file asli maksimal 10 MB.");
+  }
+
+  // Kompres gambar di browser agar dokumen Firestore tetap di bawah batas 1 MiB.
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const image = new Image();
+    image.src = objectUrl;
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = () => reject(new Error("File gambar tidak dapat dibaca."));
+    });
+
+    const maxSide = 900;
+    const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Browser tidak mendukung pemrosesan gambar.");
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    let dataUrl = canvas.toDataURL("image/jpeg", 0.68);
+    if (dataUrl.length > 450000) dataUrl = canvas.toDataURL("image/jpeg", 0.48);
+    if (dataUrl.length > 450000) {
+      throw new Error("Gambar masih terlalu besar setelah dikompres. Pilih foto yang lebih kecil.");
+    }
+    return dataUrl;
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 addRecipeForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const submitButton = addRecipeForm.querySelector('[type="submit"]');
@@ -795,6 +620,17 @@ addRecipeForm?.addEventListener("submit", async (event) => {
     .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const id = `${slug || "resep"}-${Date.now()}`;
 
+  try {
+    let imageUrl = String(formData.get("image") || "").trim();
+    const selectedFile = imageFileInput?.files?.[0];
+    if (selectedFile) {
+      addRecipeMessage.textContent = "Mengompres gambar...";
+      imageUrl = await localImageToDataUrl(selectedFile);
+    }
+    if (imageUrl && !/^https?:\/\/\S+$/i.test(imageUrl) && !/^data:image\/(png|jpeg|webp|gif);base64,/i.test(imageUrl)) {
+      throw new Error("Masukkan URL gambar yang valid atau pilih file gambar.");
+    }
+
   const newRecipe = {
     id,
     name,
@@ -808,12 +644,10 @@ addRecipeForm?.addEventListener("submit", async (event) => {
     amounts: amounts.length ? amounts : ingredients,
     steps,
     description: String(formData.get("description") || "").trim(),
-    image: String(formData.get("image") || "").trim() ||
-      "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=900&q=85",
+    image: imageUrl,
     createdAt: serverTimestamp()
   };
 
-  try {
     await addDoc(recipesCollection, newRecipe);
     recipes.push({ ...newRecipe, createdAt: undefined });
     render();
@@ -822,71 +656,13 @@ addRecipeForm?.addEventListener("submit", async (event) => {
     addRecipeForm.reset();
   } catch (error) {
     console.error("Gagal menyimpan resep:", error);
-    addRecipeMessage.textContent =
+    addRecipeMessage.textContent = error?.message ||
       "Gagal menyimpan. Periksa Firestore Rules dan koneksi internet.";
     showToast("Resep belum tersimpan. Periksa Rules Firestore.");
   } finally {
     submitButton.disabled = false;
   }
-});
-
-/* =========================================
-   11. JALANKAN WEBSITE
-========================================= */
-
-render();
-loadRecipesFromFirestore();
-
-console.log("Sehatin berhasil dijalankan.");
-console.log(`Jumlah resep: ${recipes.length}`);
-
-
-/* =========================================
-   12. NAVBAR: MENU AKTIF DAN SCROLL
-========================================= */
-const navLinks = [...document.querySelectorAll(".nav-menu .nav-link")];
-const navTargets = navLinks
-  .map((link) => document.querySelector(link.getAttribute("href")))
-  .filter(Boolean);
-
-function setActiveNav(targetId) {
-  navLinks.forEach((link) => {
-    const isActive = link.getAttribute("href") === `#${targetId}`;
-    link.classList.toggle("active", isActive);
-    if (isActive) {
-      link.setAttribute("aria-current", "location");
-    } else {
-      link.removeAttribute("aria-current");
-    }
-  });
 }
+);
 
-navLinks.forEach((link) => {
-  link.addEventListener("click", () => {
-    const targetId = link.getAttribute("href")?.slice(1);
-    if (targetId) setActiveNav(targetId);
-  });
-});
-
-// Ubah menu aktif berdasarkan bagian halaman yang paling terlihat.
-if ("IntersectionObserver" in window) {
-  const navObserver = new IntersectionObserver(
-    (entries) => {
-      const visibleSections = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-
-      if (visibleSections.length) {
-        setActiveNav(visibleSections[0].target.id);
-      }
-    },
-    {
-      root: null,
-      rootMargin: "-25% 0px -55% 0px",
-      threshold: [0, 0.1, 0.25, 0.5, 0.75],
-    }
-  );
-
-  navTargets.forEach((section) => navObserver.observe(section));
-}
 
