@@ -47,9 +47,9 @@ async function loadRecipesFromFirestore() {
         firestoreDocId: docSnap.id,
       };
     });
-    // Firestore adalah sumber data utama. Ganti seluruh daftar dengan hasil terbaru,
-    // jangan menggabungkan data lama di memori agar tidak ada resep duplikat/usang.
-    recipes = firestoreRecipes;
+    const combined = new Map(recipes.map((recipe) => [recipe.id, recipe]));
+    firestoreRecipes.forEach((recipe) => combined.set(recipe.id, recipe));
+    recipes = [...combined.values()];
     favorites = loadFavorites();
     render();
     console.info(
@@ -65,7 +65,41 @@ async function loadRecipesFromFirestore() {
 
 const searchInput = document.getElementById("search-input");
 const allergyFilter = document.getElementById("allergy-filter");
-const dietFilter = document.getElementById("diet-filter");
+const allergyDropdownButton = document.getElementById("allergy-dropdown-button");
+const allergyDropdownMenu = document.getElementById("allergy-dropdown-menu");
+const allergyDropdownLabel = document.getElementById("allergy-dropdown-label");
+const allergyCheckboxes = Array.from(document.querySelectorAll(".allergy-checkbox"));
+
+function getSelectedAllergies() {
+  return allergyCheckboxes.filter((checkbox) => checkbox.checked)
+    .map((checkbox) => checkbox.value.toLowerCase());
+}
+
+function updateAllergyDropdownLabel() {
+  const selected = allergyCheckboxes.filter((checkbox) => checkbox.checked)
+    .map((checkbox) => checkbox.parentElement.querySelector("span").textContent.trim());
+  if (allergyDropdownLabel) {
+    allergyDropdownLabel.textContent = selected.length ? selected.join(", ") : "Semua alergi";
+  }
+}
+
+allergyDropdownButton?.addEventListener("click", () => {
+  const opening = allergyDropdownMenu.hidden;
+  allergyDropdownMenu.hidden = !opening;
+  allergyDropdownButton.setAttribute("aria-expanded", String(opening));
+});
+
+allergyCheckboxes.forEach((checkbox) => checkbox.addEventListener("change", () => {
+  updateAllergyDropdownLabel();
+  render();
+}));
+
+document.addEventListener("click", (event) => {
+  if (allergyDropdownMenu && !event.target.closest(".allergy-multiselect")) {
+    allergyDropdownMenu.hidden = true;
+    allergyDropdownButton?.setAttribute("aria-expanded", "false");
+  }
+});
 
 const recipeGrid = document.getElementById("recipe-grid");
 const favoriteGrid = document.getElementById("favorite-grid");
@@ -84,6 +118,7 @@ const dialogContent = document.getElementById("dialog-content");
 const toast = document.getElementById("toast");
 const addRecipeDialog = document.getElementById("add-recipe-dialog");
 const addRecipeForm = document.getElementById("add-recipe-form");
+const imageUrlInput = null;
 const imageFileInput = addRecipeForm.querySelector('input[name="imageFile"]');
 const addRecipeMessage = document.getElementById("add-recipe-message");
 function loadFavorites() {
@@ -235,33 +270,23 @@ function createRecipeCard(recipe) {
 function getFilteredRecipes() {
   const searchTerm = searchInput.value.trim().toLowerCase();
   const ingredientTerm = allergyFilter.value.trim().toLowerCase();
-  const allergyTerm = dietFilter.value.trim().toLowerCase();
+  const selectedAllergies = getSelectedAllergies();
 
   return recipes.filter((recipe) => {
     const recipeName = String(recipe.name || "").toLowerCase();
     const description = String(recipe.description || "").toLowerCase();
-
     const ingredients = Array.isArray(recipe.ingredients)
-      ? recipe.ingredients.join(" ").toLowerCase()
+      ? recipe.ingredients.map(String).join(" ").toLowerCase()
       : String(recipe.ingredients || "").toLowerCase();
-
     const allergens = Array.isArray(recipe.allergens)
-      ? recipe.allergens.join(" ").toLowerCase()
-      : String(recipe.allergens || "").toLowerCase();
+      ? recipe.allergens.map((item) => String(item).trim().toLowerCase())
+      : String(recipe.allergens || "").split(/[,;\n]/).map((item) => item.trim().toLowerCase()).filter(Boolean);
 
-    const matchesSearch =
-      !searchTerm ||
-      recipeName.includes(searchTerm) ||
-      description.includes(searchTerm) ||
-      ingredients.includes(searchTerm);
+    const matchesSearch = !searchTerm || recipeName.includes(searchTerm) || description.includes(searchTerm) || ingredients.includes(searchTerm);
+    const matchesIngredient = !ingredientTerm || ingredients.includes(ingredientTerm);
+    const containsSelectedAllergy = selectedAllergies.some((allergy) => allergens.includes(allergy));
 
-    const matchesIngredient =
-      !ingredientTerm || ingredients.includes(ingredientTerm);
-
-    const matchesAllergy =
-      !allergyTerm || allergens.includes(allergyTerm);
-
-    return matchesSearch && matchesIngredient && matchesAllergy;
+    return matchesSearch && matchesIngredient && !containsSelectedAllergy;
   });
 }
 /* =========================================
@@ -287,12 +312,11 @@ function render() {
     filterDescriptions.push(`Pencarian: "${searchInput.value.trim()}"`);
   }
   if (allergyFilter.value) {
-    filterDescriptions.push(`Bahan dasar: ${allergyFilter.value}`);
+    filterDescriptions.push(`Tanpa bahan: ${allergyFilter.value}`);
   }
-  if (dietFilter.value) {
-    filterDescriptions.push(
-      `Alergi: ${dietFilter.value}`,
-    );
+  const selectedAllergies = getSelectedAllergies();
+  if (selectedAllergies.length) {
+    filterDescriptions.push(`Hindari alergi: ${selectedAllergies.join(", ")}`);
   }
 
   activeFilter.textContent = filterDescriptions.length
@@ -457,16 +481,17 @@ function toggleFavorite(recipeId) {
 // Pencarian langsung ketika pengguna mengetik
 searchInput.addEventListener("input", render);
 
-// Filter ketika pilihan diubah
+// Filter bahan dasar saat nilai berubah
 allergyFilter.addEventListener("input", render);
-dietFilter.addEventListener("input", render);
 
 // Reset semua filter
 function resetFilters() {
   searchInput.value = "";
   allergyFilter.value = "";
-  dietFilter.value = "";
-
+  allergyCheckboxes.forEach((checkbox) => { checkbox.checked = false; });
+  updateAllergyDropdownLabel();
+  if (allergyDropdownMenu) allergyDropdownMenu.hidden = true;
+  allergyDropdownButton?.setAttribute("aria-expanded", "false");
   render();
 }
 
@@ -578,15 +603,15 @@ addRecipeForm?.addEventListener("submit", async (event) => {
   const formData = new FormData(addRecipeForm);
   const name = String(formData.get("name") || "").trim();
   const ingredients = String(formData.get("ingredients") || "")
-    .split(/[,;\n]/)
+    .split(/[,\\n]/)
     .map((item) => item.trim())
     .filter(Boolean);
   const amounts = String(formData.get("amounts") || "")
-    .split(/\r?\n/)
+    .split("\\n")
     .map((item) => item.trim())
     .filter(Boolean);
   const steps = String(formData.get("steps") || "")
-    .split(/\r?\n/)
+    .split("\\n")
     .map((item) => item.trim())
     .filter(Boolean);
   const allergensText = String(formData.get("allergens") || "").trim();
@@ -604,7 +629,7 @@ addRecipeForm?.addEventListener("submit", async (event) => {
   const slug = name
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\\u0300-\\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
   const id = `${slug || "resep"}-${Date.now()}`;
@@ -612,7 +637,7 @@ addRecipeForm?.addEventListener("submit", async (event) => {
   try {
     const selectedFile = imageFileInput?.files?.[0];
     if (!selectedFile) {
-      throw new Error("Pilih gambar dari perangkat terlebih dahulu.");
+      throw new Error("Silakan pilih file gambar dari perangkat.");
     }
     addRecipeMessage.textContent = "Mengompres gambar...";
     const imageUrl = await localImageToDataUrl(selectedFile);
@@ -634,14 +659,12 @@ addRecipeForm?.addEventListener("submit", async (event) => {
       createdAt: serverTimestamp(),
     };
 
-    const savedDoc = await addDoc(recipesCollection, newRecipe);
-    // Use the Firestore document ID for stable identification, while preserving recipe id.
-    recipes.push({ ...newRecipe, firestoreDocId: savedDoc.id, createdAt: undefined });
+    await addDoc(recipesCollection, newRecipe);
+    recipes.push({ ...newRecipe, createdAt: undefined });
     render();
-    addRecipeForm.reset();
-    addRecipeMessage.textContent = "";
     addRecipeDialog.close();
-    showToast("Resep berhasil disimpan. Data tetap tampil dan akan dimuat kembali dari Firestore saat halaman dibuka.");
+    showToast("Resep berhasil disimpan ke Firebase!");
+    addRecipeForm.reset();
   } catch (error) {
     console.error("Gagal menyimpan resep:", error);
     addRecipeMessage.textContent =
@@ -653,6 +676,32 @@ addRecipeForm?.addEventListener("submit", async (event) => {
   }
 });
 
-
-// Muat resep dari Firestore setiap kali halaman dibuka/di-refresh.
+// Muat resep dari Firestore setiap kali halaman dibuka atau di-refresh.
 loadRecipesFromFirestore();
+
+// Mengatur menu navbar yang aktif
+const navLinks = document.querySelectorAll(".nav-link");
+
+function setActiveNav() {
+  const currentHash = window.location.hash || "#beranda";
+
+  navLinks.forEach((link) => {
+    const isActive = link.getAttribute("href") === currentHash;
+
+    link.classList.toggle("active", isActive);
+  });
+}
+
+// Saat menu diklik
+navLinks.forEach((link) => {
+  link.addEventListener("click", () => {
+    navLinks.forEach((item) => item.classList.remove("active"));
+    link.classList.add("active");
+  });
+});
+
+// Saat hash URL berubah atau halaman dibuka ulang
+window.addEventListener("hashchange", setActiveNav);
+window.addEventListener("DOMContentLoaded", setActiveNav);
+
+setActiveNav();
