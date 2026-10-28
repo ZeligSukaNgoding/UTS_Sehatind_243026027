@@ -465,7 +465,7 @@ h2 em {
 }
 
 .search-box input,
-.filter-box select {
+.filter-box input {
   width: 100%;
   min-width: 0;
   height: 48px;
@@ -484,7 +484,7 @@ h2 em {
 }
 
 .search-box input:focus,
-.filter-box select:focus {
+.filter-box input:focus {
   border-color: #78aa70;
   box-shadow: 0 0 0 4px rgba(57, 131, 61, 0.1);
 }
@@ -1565,26 +1565,34 @@ section {
 .allergy-option input[type=checkbox] { width: 17px; height: 17px; margin: 0; accent-color: var(--green); cursor: pointer; }
 .allergy-option span { flex: 1; }
 
-#allergy-filter {
-  width: 100%;
-  min-width: 0;
-  min-height: 52px;
-  box-sizing: border-box;
-  padding: 0 16px;
-  border: 1px solid #e3e8d9;
-  border-radius: 14px;
-  background: #fbfcf8;
-  color: #183f32;
-  font-family: inherit;
+
+/* Pagination daftar resep: maksimal 6 kartu per halaman */
+.recipe-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 32px 0 8px;
+}
+.recipe-pagination[hidden] { display: none; }
+.recipe-pagination button {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--border, #dce7d5);
+  border-radius: 10px;
+  background: var(--white, #fff);
+  color: var(--green-dark, #24553b);
+  font: inherit;
   font-size: 14px;
-  outline: none;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
 }
-
-#allergy-filter::placeholder {
-  color: #9aab9f;
-}
-
-#allergy-filter:focus {
-  border-color: #43894c;
-  box-shadow: 0 0 0 3px rgba(67, 137, 76, 0.12);
+.recipe-pagination button:hover:not(:disabled) { background: var(--green-soft, #edf5e5); }
+.recipe-pagination button.active { background: var(--green, #388344); border-color: var(--green, #388344); color: #fff; }
+.recipe-pagination button:disabled { opacity: .45; cursor: not-allowed; }
+.page-numbers { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+@media (max-width: 480px) {
+  .recipe-pagination { gap: 5px; }
+  .recipe-pagination button { min-height: 38px; padding: 7px 10px; font-size: 12px; }
 }

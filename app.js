@@ -63,6 +63,15 @@ async function loadRecipesFromFirestore() {
   }
 }
 
+// Navigasi utama: pindah ke bagian yang dipilih dan perbarui garis aktif.
+const mainNavLinks = Array.from(document.querySelectorAll(".nav-menu .nav-link"));
+mainNavLinks.forEach((link) => {
+  link.addEventListener("click", () => {
+    mainNavLinks.forEach((item) => item.classList.remove("active"));
+    link.classList.add("active");
+  });
+});
+
 const searchInput = document.getElementById("search-input");
 const allergyFilter = document.getElementById("allergy-filter");
 const allergyDropdownButton = document.getElementById("allergy-dropdown-button");
@@ -103,6 +112,14 @@ document.addEventListener("click", (event) => {
 
 const recipeGrid = document.getElementById("recipe-grid");
 const favoriteGrid = document.getElementById("favorite-grid");
+
+// Maksimal enam resep ditampilkan pada setiap halaman.
+const RECIPES_PER_PAGE = 6;
+let currentRecipePage = 1;
+const paginationElement = document.getElementById("recipe-pagination");
+const prevPageButton = document.getElementById("prev-page");
+const nextPageButton = document.getElementById("next-page");
+const pageNumbersElement = document.getElementById("page-numbers");
 
 const resultCount = document.getElementById("result-count");
 const recipeTotal = document.getElementById("recipe-total");
@@ -267,24 +284,51 @@ function createRecipeCard(recipe) {
   return card;
 }
 
+// Menormalkan teks agar pencarian tidak sensitif huruf besar/kecil,
+// aksen, tanda baca, atau spasi berlebih.
+function normalizeFilterText(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("id-ID")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
 function getFilteredRecipes() {
-  const searchTerm = searchInput.value.trim().toLowerCase();
-  const ingredientTerm = allergyFilter.value.trim().toLowerCase();
-  const selectedAllergies = getSelectedAllergies();
+  const searchTerm = normalizeFilterText(searchInput.value);
+  const ingredientTerm = normalizeFilterText(allergyFilter.value);
+  const selectedAllergies = getSelectedAllergies().map(normalizeFilterText);
 
   return recipes.filter((recipe) => {
-    const recipeName = String(recipe.name || "").toLowerCase();
-    const description = String(recipe.description || "").toLowerCase();
-    const ingredients = Array.isArray(recipe.ingredients)
-      ? recipe.ingredients.map(String).join(" ").toLowerCase()
-      : String(recipe.ingredients || "").toLowerCase();
-    const allergens = Array.isArray(recipe.allergens)
-      ? recipe.allergens.map((item) => String(item).trim().toLowerCase())
-      : String(recipe.allergens || "").split(/[,;\n]/).map((item) => item.trim().toLowerCase()).filter(Boolean);
+    const recipeName = normalizeFilterText(recipe.name);
+    const description = normalizeFilterText(recipe.description);
+    const category = normalizeFilterText(recipe.category);
+    const ingredients = normalizeFilterText([
+      ...(Array.isArray(recipe.ingredients) ? recipe.ingredients : [recipe.ingredients]),
+      ...(Array.isArray(recipe.amounts) ? recipe.amounts : [recipe.amounts]),
+    ].filter(Boolean).join(" "));
 
-    const matchesSearch = !searchTerm || recipeName.includes(searchTerm) || description.includes(searchTerm) || ingredients.includes(searchTerm);
-    const matchesIngredient = !ingredientTerm || ingredients.includes(ingredientTerm);
-    const containsSelectedAllergy = selectedAllergies.some((allergy) => allergens.includes(allergy));
+    // Form "Cari resep" hanya mencari berdasarkan NAMA RESEP,
+    // bukan kategori seperti "Salad Nusantara" atau "Salad Buah".
+    // Form "Berdasarkan bahan dasar" hanya mencari di daftar bahan.
+    const allergens = Array.isArray(recipe.allergens)
+      ? recipe.allergens.map(normalizeFilterText)
+      : String(recipe.allergens || "")
+          .split(/[,;\n]/)
+          .map(normalizeFilterText)
+          .filter(Boolean);
+
+    const matchesSearch = !searchTerm || searchTerm
+      .split(" ")
+      .every((word) => recipeName.includes(word));
+    const matchesIngredient = !ingredientTerm || ingredientTerm
+      .split(" ")
+      .every((word) => ingredients.includes(word));
+    const containsSelectedAllergy = selectedAllergies.some((allergy) =>
+      allergy && allergens.some((item) => item.includes(allergy))
+    );
 
     return matchesSearch && matchesIngredient && !containsSelectedAllergy;
   });
@@ -301,9 +345,56 @@ function renderRecipeList(container, recipeList) {
   });
 }
 
+function renderPagination(totalRecipes) {
+  const totalPages = Math.ceil(totalRecipes / RECIPES_PER_PAGE);
+  paginationElement.hidden = totalPages <= 1;
+
+  if (totalPages === 0) currentRecipePage = 1;
+  else if (currentRecipePage > totalPages) currentRecipePage = totalPages;
+
+  prevPageButton.disabled = currentRecipePage <= 1;
+  nextPageButton.disabled = currentRecipePage >= totalPages;
+  pageNumbersElement.replaceChildren();
+
+  for (let page = 1; page <= totalPages; page += 1) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = String(page);
+    button.classList.toggle("active", page === currentRecipePage);
+    button.setAttribute("aria-label", `Halaman ${page}`);
+    if (page === currentRecipePage) button.setAttribute("aria-current", "page");
+    button.addEventListener("click", () => {
+      currentRecipePage = page;
+      render();
+    });
+    pageNumbersElement.appendChild(button);
+  }
+}
+
+prevPageButton.addEventListener("click", () => {
+  if (currentRecipePage > 1) {
+    currentRecipePage -= 1;
+    render();
+  }
+});
+
+nextPageButton.addEventListener("click", () => {
+  const totalPages = Math.ceil(getFilteredRecipes().length / RECIPES_PER_PAGE);
+  if (currentRecipePage < totalPages) {
+    currentRecipePage += 1;
+    render();
+  }
+});
+
 function render() {
   const filteredRecipes = getFilteredRecipes();
-  renderRecipeList(recipeGrid, filteredRecipes);
+  const totalPages = Math.ceil(filteredRecipes.length / RECIPES_PER_PAGE);
+  if (totalPages === 0) currentRecipePage = 1;
+  else if (currentRecipePage > totalPages) currentRecipePage = totalPages;
+  const startIndex = (currentRecipePage - 1) * RECIPES_PER_PAGE;
+  const visibleRecipes = filteredRecipes.slice(startIndex, startIndex + RECIPES_PER_PAGE);
+  renderRecipeList(recipeGrid, visibleRecipes);
+  renderPagination(filteredRecipes.length);
   recipeTotal.textContent = recipes.length;
   resultCount.textContent = `${filteredRecipes.length} resep ditemukan`;
   emptyState.hidden = filteredRecipes.length > 0;
@@ -312,7 +403,7 @@ function render() {
     filterDescriptions.push(`Pencarian: "${searchInput.value.trim()}"`);
   }
   if (allergyFilter.value) {
-    filterDescriptions.push(`Tanpa bahan: ${allergyFilter.value}`);
+    filterDescriptions.push(`Bahan dasar: "${allergyFilter.value.trim()}"`);
   }
   const selectedAllergies = getSelectedAllergies();
   if (selectedAllergies.length) {
@@ -478,11 +569,19 @@ function toggleFavorite(recipeId) {
   }
 }
 
-// Pencarian langsung ketika pengguna mengetik
-searchInput.addEventListener("input", render);
+// Pencarian langsung ketika pengguna mengetik. Kembali ke halaman pertama
+// supaya hasil filter tidak tertinggal pada nomor halaman sebelumnya.
+searchInput.addEventListener("input", () => {
+  currentRecipePage = 1;
+  render();
+});
 
-// Filter bahan dasar saat nilai berubah
-allergyFilter.addEventListener("input", render);
+// Filter bahan dasar menerima input bebas dan mencari pada nama resep,
+// kategori, deskripsi, serta daftar bahan.
+allergyFilter.addEventListener("input", () => {
+  currentRecipePage = 1;
+  render();
+});
 
 // Reset semua filter
 function resetFilters() {
@@ -678,30 +777,3 @@ addRecipeForm?.addEventListener("submit", async (event) => {
 
 // Muat resep dari Firestore setiap kali halaman dibuka atau di-refresh.
 loadRecipesFromFirestore();
-
-// Mengatur menu navbar yang aktif
-const navLinks = document.querySelectorAll(".nav-link");
-
-function setActiveNav() {
-  const currentHash = window.location.hash || "#beranda";
-
-  navLinks.forEach((link) => {
-    const isActive = link.getAttribute("href") === currentHash;
-
-    link.classList.toggle("active", isActive);
-  });
-}
-
-// Saat menu diklik
-navLinks.forEach((link) => {
-  link.addEventListener("click", () => {
-    navLinks.forEach((item) => item.classList.remove("active"));
-    link.classList.add("active");
-  });
-});
-
-// Saat hash URL berubah atau halaman dibuka ulang
-window.addEventListener("hashchange", setActiveNav);
-window.addEventListener("DOMContentLoaded", setActiveNav);
-
-setActiveNav();

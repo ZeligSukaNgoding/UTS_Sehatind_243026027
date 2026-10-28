@@ -99,19 +99,19 @@
             <input
               type="search"
               id="search-input"
-              placeholder="Contoh: gado-gado..."
+              placeholder="Ketik nama resep, misalnya gado-gado..."
             />
           </div>
 
           <div class="filter-box">
-  <label for="allergy-filter">Berdasarkan bahan dasar</label>
-  <input
-    type="text"
-    id="allergy-filter"
-    placeholder="Ketik bahan dasar..."
-    autocomplete="off"
-  />
-</div>
+            <label for="allergy-filter">Berdasarkan bahan dasar</label>
+            <input
+              type="text"
+              id="allergy-filter"
+              placeholder="Ketik bahan, misalnya wortel atau seafood..."
+              autocomplete="off"
+            />
+          </div>
 
           <div class="filter-box allergy-multiselect">
             <label for="allergy-dropdown-button">Pilih alergi yang ingin dihindari</label>
@@ -142,6 +142,11 @@
             Hapus Filter
           </button>
         </div>
+        <nav id="recipe-pagination" class="recipe-pagination" aria-label="Navigasi halaman resep" hidden>
+          <button id="prev-page" type="button" disabled aria-label="Halaman sebelumnya">&laquo; Sebelumnya</button>
+          <div id="page-numbers" class="page-numbers"></div>
+          <button id="next-page" type="button" disabled aria-label="Halaman berikutnya">Berikutnya &raquo;</button>
+        </nav>
       </section>
       <section class="favorite-section" id="favorit">
         <div class="favorite-heading">
@@ -290,6 +295,11 @@
                 type="file"
                 accept="image/*"
               />
+              <small
+                >Gambar akan dikompres dan disimpan bersama dokumen Firestore.
+                Pilih foto maksimal 10 MB; ukuran hasil kompres dibatasi agar
+                dokumen tidak terlalu besar.</small
+              >
             </label>
             <label class="full-width">
               Atau URL gambar (opsional)
@@ -329,6 +339,6 @@
     </dialog>
     <div id="toast" class="toast" role="status"></div>
 
-    <script type="module" src="app.js?v=20261028-final-multi-allergy"></script>
+    <script type="module" src="app.js?v=20261029-pagination"></script>
   </body>
 </html>
