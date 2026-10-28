@@ -105,29 +105,28 @@
 
           <div class="filter-box">
             <label for="allergy-filter">Berdasarkan bahan dasar</label>
-            <select id="allergy-filter">
-              <option value="">Semua bahan</option>
-              <option value="kacang">Kacang</option>
-              <option value="susu">Susu</option>
-              <option value="telur">Telur</option>
-              <option value="seafood">Seafood</option>
-              <option value="gluten">Gluten</option>
-              <option value="kedelai">Kedelai</option>
-            </select>
+            <input
+              type="text"
+              id="allergy-filter"
+              placeholder="Ketik bahan dasar..."
+              autocomplete="off"
+            />
           </div>
 
-          <div class="filter-box">
-            <label for="diet-filter">Pilih alergi</label>
-            <select id="diet-filter">
-              <option value="">Semua alergi</option>
-              <option value="kacang">Kacang</option>
-              <option value="susu">Susu</option>
-              <option value="telur">Telur</option>
-              <option value="seafood">Seafood</option>
-              <option value="gluten">Gluten</option>
-              <option value="kedelai">Kedelai</option>
-            </select>
-          </div>
+          
+<div class="filter-box">
+  <label for="diet-filter">Pilih alergi</label>
+  <select id="diet-filter">
+    <option value="">Semua alergi</option>
+    <option value="kacang">Kacang</option>
+    <option value="susu">Susu</option>
+    <option value="telur">Telur</option>
+    <option value="seafood">Seafood</option>
+    <option value="gluten">Gluten</option>
+    <option value="kedelai">Kedelai</option>
+  </select>
+</div>
+
 
           <button id="reset-filters" class="reset-button" type="button">
             Reset
@@ -284,30 +283,18 @@
               ></textarea>
             </label>
             <label class="full-width">
-              Upload gambar dari perangkat (opsional)
+              Upload gambar dari perangkat
               <input
                 id="image-file"
                 name="imageFile"
                 type="file"
                 accept="image/*"
+                required
               />
               <small
                 >Gambar akan dikompres dan disimpan bersama dokumen Firestore.
                 Pilih foto maksimal 10 MB; ukuran hasil kompres dibatasi agar
                 dokumen tidak terlalu besar.</small
-              >
-            </label>
-            <label class="full-width">
-              Atau URL gambar (opsional)
-              <input
-                id="image-url"
-                name="image"
-                type="url"
-                placeholder="https://contoh.com/gambar.jpg"
-              />
-              <small
-                >Jika file dan URL diisi, file dari perangkat akan
-                digunakan.</small
               >
             </label>
           </div>
@@ -335,6 +322,6 @@
     </dialog>
     <div id="toast" class="toast" role="status"></div>
 
-    <script type="module" src="app.js?v=20261028-4"></script>
+    <script type="module" src="app.js?v=20261028-5"></script>
   </body>
 </html>

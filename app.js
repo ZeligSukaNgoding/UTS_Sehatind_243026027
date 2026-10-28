@@ -47,9 +47,9 @@ async function loadRecipesFromFirestore() {
         firestoreDocId: docSnap.id,
       };
     });
-    const combined = new Map(recipes.map((recipe) => [recipe.id, recipe]));
-    firestoreRecipes.forEach((recipe) => combined.set(recipe.id, recipe));
-    recipes = [...combined.values()];
+    // Firestore adalah sumber data utama. Ganti seluruh daftar dengan hasil terbaru,
+    // jangan menggabungkan data lama di memori agar tidak ada resep duplikat/usang.
+    recipes = firestoreRecipes;
     favorites = loadFavorites();
     render();
     console.info(
@@ -84,7 +84,6 @@ const dialogContent = document.getElementById("dialog-content");
 const toast = document.getElementById("toast");
 const addRecipeDialog = document.getElementById("add-recipe-dialog");
 const addRecipeForm = document.getElementById("add-recipe-form");
-const imageUrlInput = addRecipeForm.querySelector('input[name="image"]');
 const imageFileInput = addRecipeForm.querySelector('input[name="imageFile"]');
 const addRecipeMessage = document.getElementById("add-recipe-message");
 function loadFavorites() {
@@ -288,11 +287,11 @@ function render() {
     filterDescriptions.push(`Pencarian: "${searchInput.value.trim()}"`);
   }
   if (allergyFilter.value) {
-    filterDescriptions.push(`Tanpa bahan: ${allergyFilter.value}`);
+    filterDescriptions.push(`Bahan dasar: ${allergyFilter.value}`);
   }
   if (dietFilter.value) {
     filterDescriptions.push(
-      `Preferensi: ${dietFilter.value.replace("-", " ")}`,
+      `Alergi: ${dietFilter.value}`,
     );
   }
 
@@ -459,8 +458,8 @@ function toggleFavorite(recipeId) {
 searchInput.addEventListener("input", render);
 
 // Filter ketika pilihan diubah
-allergyFilter.addEventListener("change", render);
-dietFilter.addEventListener("change", render);
+allergyFilter.addEventListener("input", render);
+dietFilter.addEventListener("input", render);
 
 // Reset semua filter
 function resetFilters() {
@@ -579,15 +578,15 @@ addRecipeForm?.addEventListener("submit", async (event) => {
   const formData = new FormData(addRecipeForm);
   const name = String(formData.get("name") || "").trim();
   const ingredients = String(formData.get("ingredients") || "")
-    .split(/[,\\n]/)
+    .split(/[,;\n]/)
     .map((item) => item.trim())
     .filter(Boolean);
   const amounts = String(formData.get("amounts") || "")
-    .split("\\n")
+    .split(/\r?\n/)
     .map((item) => item.trim())
     .filter(Boolean);
   const steps = String(formData.get("steps") || "")
-    .split("\\n")
+    .split(/\r?\n/)
     .map((item) => item.trim())
     .filter(Boolean);
   const allergensText = String(formData.get("allergens") || "").trim();
@@ -605,25 +604,18 @@ addRecipeForm?.addEventListener("submit", async (event) => {
   const slug = name
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\\u0300-\\u036f]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
   const id = `${slug || "resep"}-${Date.now()}`;
 
   try {
-    let imageUrl = String(formData.get("image") || "").trim();
     const selectedFile = imageFileInput?.files?.[0];
-    if (selectedFile) {
-      addRecipeMessage.textContent = "Mengompres gambar...";
-      imageUrl = await localImageToDataUrl(selectedFile);
+    if (!selectedFile) {
+      throw new Error("Pilih gambar dari perangkat terlebih dahulu.");
     }
-    if (
-      imageUrl &&
-      !/^https?:\/\/\S+$/i.test(imageUrl) &&
-      !/^data:image\/(png|jpeg|webp|gif);base64,/i.test(imageUrl)
-    ) {
-      throw new Error("Masukkan URL gambar yang valid atau pilih file gambar.");
-    }
+    addRecipeMessage.textContent = "Mengompres gambar...";
+    const imageUrl = await localImageToDataUrl(selectedFile);
 
     const newRecipe = {
       id,
@@ -642,12 +634,14 @@ addRecipeForm?.addEventListener("submit", async (event) => {
       createdAt: serverTimestamp(),
     };
 
-    await addDoc(recipesCollection, newRecipe);
-    recipes.push({ ...newRecipe, createdAt: undefined });
+    const savedDoc = await addDoc(recipesCollection, newRecipe);
+    // Use the Firestore document ID for stable identification, while preserving recipe id.
+    recipes.push({ ...newRecipe, firestoreDocId: savedDoc.id, createdAt: undefined });
     render();
-    addRecipeDialog.close();
-    showToast("Resep berhasil disimpan ke Firebase!");
     addRecipeForm.reset();
+    addRecipeMessage.textContent = "";
+    addRecipeDialog.close();
+    showToast("Resep berhasil disimpan. Data tetap tampil dan akan dimuat kembali dari Firestore saat halaman dibuka.");
   } catch (error) {
     console.error("Gagal menyimpan resep:", error);
     addRecipeMessage.textContent =
@@ -658,3 +652,7 @@ addRecipeForm?.addEventListener("submit", async (event) => {
     submitButton.disabled = false;
   }
 });
+
+
+// Muat resep dari Firestore setiap kali halaman dibuka/di-refresh.
+loadRecipesFromFirestore();
