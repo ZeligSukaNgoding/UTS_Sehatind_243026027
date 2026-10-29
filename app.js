@@ -545,13 +545,13 @@ function openRecipe(recipeId) {
   favoriteButton.className = "primary-button";
   favoriteButton.dataset.favorite = recipe.id;
   favoriteButton.textContent = favorites.has(recipe.id)
-    ? "★ Hapus dari favorit"
-    : "☆ Simpan ke favorit";
+    ? "Hapus dari favorit"
+    : "Simpan ke favorit";
 
   body.append(
     category,
     allergyInfo,
-    title,
+    title,  
     description,
     facts,
     ingredientsTitle,
