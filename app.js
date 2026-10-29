@@ -63,7 +63,6 @@ async function loadRecipesFromFirestore() {
   }
 }
 
-// Navigasi utama: klik melakukan scroll halus, dan menu aktif mengikuti posisi scroll.
 const mainNavLinks = Array.from(document.querySelectorAll(".nav-menu .nav-link"));
 const navSections = mainNavLinks
   .map((link) => document.querySelector(link.getAttribute("href")))
@@ -85,7 +84,6 @@ mainNavLinks.forEach((link) => {
     event.preventDefault();
     setActiveNav(target.id);
     target.scrollIntoView({ behavior: "smooth", block: "start" });
-    // Pastikan URL hash ikut berubah tanpa lompatan mendadak.
     if (window.location.hash !== `#${target.id}`) {
       history.replaceState(null, "", `#${target.id}`);
     }
@@ -103,7 +101,6 @@ function updateActiveNavOnScroll() {
     if (section.getBoundingClientRect().top <= marker) currentSection = section;
   }
 
-  // Saat mencapai dasar halaman, bagian Favorit menjadi menu aktif.
   const atPageBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
   if (atPageBottom && document.getElementById("favorit")) {
     currentSection = document.getElementById("favorit");
@@ -163,7 +160,6 @@ document.addEventListener("click", (event) => {
 const recipeGrid = document.getElementById("recipe-grid");
 const favoriteGrid = document.getElementById("favorite-grid");
 
-// Maksimal enam resep ditampilkan pada setiap halaman.
 const RECIPES_PER_PAGE = 6;
 let currentRecipePage = 1;
 const paginationElement = document.getElementById("recipe-pagination");
@@ -334,8 +330,6 @@ function createRecipeCard(recipe) {
   return card;
 }
 
-// Menormalkan teks agar pencarian tidak sensitif huruf besar/kecil,
-// aksen, tanda baca, atau spasi berlebih.
 function normalizeFilterText(value) {
   return String(value ?? "")
     .normalize("NFD")
@@ -360,9 +354,6 @@ function getFilteredRecipes() {
       ...(Array.isArray(recipe.amounts) ? recipe.amounts : [recipe.amounts]),
     ].filter(Boolean).join(" "));
 
-    // Form "Cari resep" hanya mencari berdasarkan NAMA RESEP,
-    // bukan kategori seperti "Salad Nusantara" atau "Salad Buah".
-    // Form "Berdasarkan bahan dasar" hanya mencari di daftar bahan.
     const allergens = Array.isArray(recipe.allergens)
       ? recipe.allergens.map(normalizeFilterText)
       : String(recipe.allergens || "")
@@ -383,9 +374,6 @@ function getFilteredRecipes() {
     return matchesSearch && matchesIngredient && !containsSelectedAllergy;
   });
 }
-/* =========================================
-   7. MENAMPILKAN RESEP DAN FAVORIT
-========================================= */
 
 function renderRecipeList(container, recipeList) {
   container.replaceChildren();
@@ -524,7 +512,6 @@ function openRecipe(recipeId) {
   protein.textContent = `${recipe.protein || 0} g protein`;
   facts.append(time, calories, protein);
 
-  // BAHAN-BAHAN: setiap bahan menjadi satu bullet
   const ingredientsTitle = document.createElement("h3");
   ingredientsTitle.textContent = "Bahan-bahan";
   const ingredientList = createRecipeList(
@@ -532,7 +519,6 @@ function openRecipe(recipeId) {
     "ul",
   );
 
-  // CARA MEMBUAT: setiap langkah mendapat nomor otomatis
   const stepsTitle = document.createElement("h3");
   stepsTitle.textContent = "Cara membuat";
   const stepsList = createRecipeList(recipe.steps || [], "ol");
@@ -612,28 +598,20 @@ function toggleFavorite(recipeId) {
   saveFavorites();
   render();
 
-  // Memperbarui tombol favorit pada detail resep
-  // jika modal sedang terbuka.
   if (recipeDialog.open) {
     openRecipe(recipeId);
   }
 }
-
-// Pencarian langsung ketika pengguna mengetik. Kembali ke halaman pertama
-// supaya hasil filter tidak tertinggal pada nomor halaman sebelumnya.
 searchInput.addEventListener("input", () => {
   currentRecipePage = 1;
   render();
 });
 
-// Filter bahan dasar menerima input bebas dan mencari pada nama resep,
-// kategori, deskripsi, serta daftar bahan.
 allergyFilter.addEventListener("input", () => {
   currentRecipePage = 1;
   render();
 });
 
-// Reset semua filter
 function resetFilters() {
   searchInput.value = "";
   allergyFilter.value = "";
@@ -650,7 +628,6 @@ document
 
 document.getElementById("empty-reset").addEventListener("click", resetFilters);
 
-// Satu event listener untuk kartu, detail, dan tombol favorit
 document.addEventListener("click", (event) => {
   const favoriteButton = event.target.closest("[data-favorite]");
 
@@ -669,12 +646,10 @@ document.addEventListener("click", (event) => {
   }
 });
 
-// Tutup modal
 document.getElementById("dialog-close").addEventListener("click", () => {
   recipeDialog.close();
 });
 
-// Tutup modal ketika area luar diklik
 recipeDialog.addEventListener("click", (event) => {
   if (event.target === recipeDialog) {
     recipeDialog.close();
@@ -705,7 +680,6 @@ async function localImageToDataUrl(file) {
     throw new Error("Ukuran file asli maksimal 10 MB.");
   }
 
-  // Kompres gambar di browser agar dokumen Firestore tetap di bawah batas 1 MiB.
   const objectUrl = URL.createObjectURL(file);
   try {
     const image = new Image();
@@ -825,5 +799,4 @@ addRecipeForm?.addEventListener("submit", async (event) => {
   }
 });
 
-// Muat resep dari Firestore setiap kali halaman dibuka atau di-refresh.
 loadRecipesFromFirestore();
