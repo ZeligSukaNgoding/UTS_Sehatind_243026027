@@ -63,14 +63,64 @@ async function loadRecipesFromFirestore() {
   }
 }
 
-// Navigasi utama: pindah ke bagian yang dipilih dan perbarui garis aktif.
+// Navigasi utama: klik melakukan scroll halus, dan menu aktif mengikuti posisi scroll.
 const mainNavLinks = Array.from(document.querySelectorAll(".nav-menu .nav-link"));
+const navSections = mainNavLinks
+  .map((link) => document.querySelector(link.getAttribute("href")))
+  .filter(Boolean);
+
+function setActiveNav(sectionId) {
+  mainNavLinks.forEach((link) => {
+    const isActive = link.getAttribute("href") === `#${sectionId}`;
+    link.classList.toggle("active", isActive);
+    if (isActive) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
+}
+
 mainNavLinks.forEach((link) => {
-  link.addEventListener("click", () => {
-    mainNavLinks.forEach((item) => item.classList.remove("active"));
-    link.classList.add("active");
+  link.addEventListener("click", (event) => {
+    const target = document.querySelector(link.getAttribute("href"));
+    if (!target) return;
+    event.preventDefault();
+    setActiveNav(target.id);
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Pastikan URL hash ikut berubah tanpa lompatan mendadak.
+    if (window.location.hash !== `#${target.id}`) {
+      history.replaceState(null, "", `#${target.id}`);
+    }
   });
 });
+
+let navScrollTicking = false;
+function updateActiveNavOnScroll() {
+  const navbar = document.querySelector(".navbar");
+  const navbarHeight = navbar ? navbar.getBoundingClientRect().height : 0;
+  const marker = navbarHeight + 70;
+  let currentSection = navSections[0];
+
+  for (const section of navSections) {
+    if (section.getBoundingClientRect().top <= marker) currentSection = section;
+  }
+
+  // Saat mencapai dasar halaman, bagian Favorit menjadi menu aktif.
+  const atPageBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+  if (atPageBottom && document.getElementById("favorit")) {
+    currentSection = document.getElementById("favorit");
+  }
+  if (currentSection) setActiveNav(currentSection.id);
+  navScrollTicking = false;
+}
+
+window.addEventListener("scroll", () => {
+  if (!navScrollTicking) {
+    window.requestAnimationFrame(updateActiveNavOnScroll);
+    navScrollTicking = true;
+  }
+}, { passive: true });
+window.addEventListener("resize", updateActiveNavOnScroll);
+window.addEventListener("load", updateActiveNavOnScroll);
+updateActiveNavOnScroll();
 
 const searchInput = document.getElementById("search-input");
 const allergyFilter = document.getElementById("allergy-filter");
