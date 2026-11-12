@@ -1,0 +1,21 @@
+{
+  "name": "sehatind",
+  "displayName": "Sehatind",
+  "version": "1.0.0",
+  "description": "Aplikasi kesehatan Sehatind",
+  "main": "index.js",
+  "scripts": {
+    "build": "cordova build android"
+  },
+  "author": "Sehatind",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "cordova-android": "^15.1.0"
+  },
+  "cordova": {
+    "platforms": [
+      "android"
+    ],
+    "plugins": {}
+  }
+}

@@ -1,0 +1,25 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<widget id="com.sehatind.app"
+        version="1.0.0"
+        xmlns="http://www.w3.org/ns/widgets"
+        xmlns:cdv="http://cordova.apache.org/ns/1.0">
+
+    <name>Sehatind</name>
+
+    <description>
+        Aplikasi kesehatan Sehatind
+    </description>
+
+    <author email="admin@sehatind.app">
+        Sehatind Developer
+    </author>
+
+    <content src="index.html" />
+
+    <access origin="*" />
+
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+
+</widget>
